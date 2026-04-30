@@ -1,0 +1,16 @@
+cmake_minimum_required(VERSION 4.2)
+project(Scripts C)
+
+set(CMAKE_C_STANDARD 23)
+
+add_executable(A11 A1/A11/A11.c)
+add_executable(A12 A1/A12/A12.c)
+add_executable(A13 A1/A13/A13.c)
+add_executable(A14 A1/A14/A14.c)
+add_executable(A21 A2/A21/A21.c)
+add_executable(A22 A2/A22/A22.c)
+add_executable(A23 A2/A23/A23.c)
+add_executable(A24 A2/A24/A24.c)
+add_executable(A24_child A2/A24/A24.child.c)
+add_executable(A25 A2/A25/A25.c)
+add_executable(A31 A3/A31/A31.c)
