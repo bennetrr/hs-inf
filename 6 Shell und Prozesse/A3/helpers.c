@@ -1,6 +1,7 @@
-#include <sys/types.h>
 #include <sys/ipc.h>
 #include <sys/sem.h>
+#include <sys/shm.h>
+#include <sys/types.h>
 
 // Creates n semaphores and returns the handle, or -1 if the creation failed
 int sem_create(const int n) {
@@ -30,4 +31,14 @@ int sem_signal(const int handle, const int n) {
     opts.sem_flg = 0;
 
     return semop(handle, &opts, 1);
+}
+
+// Create a shared memory and returns the handle, or -1 if the creation failed
+int shm_create(const key_t key, const int size) {
+    return shmget(key, size, 0666 | IPC_CREAT);
+}
+
+// Attach the shared memory to the process and return the pointer, or -1 on error
+void *shm_attach(const int handle) {
+    return shmat(handle, nullptr, 0);
 }

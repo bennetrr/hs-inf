@@ -1,4 +1,3 @@
-// ReSharper disable CppDFAEndlessLoop
 #include <stdio.h>
 #include <unistd.h>
 

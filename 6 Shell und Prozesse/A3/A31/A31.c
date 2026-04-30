@@ -2,7 +2,7 @@
 #include <unistd.h>
 #include <sys/wait.h>
 
-#include "../semaphore_helpers.c"
+#include "../helpers.c"
 
 static constexpr int SEM_NOTIFY_CHILD = 0;
 static constexpr int SEM_NOTIFY_PARENT = 1;
