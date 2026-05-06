@@ -29,11 +29,6 @@ void loop_signal_handler(const int signal) {
 
 void main_signal_handler(const int signal) {
     printf("Main: Received signal %d\n", signal);
-
-    // This sends SIGTERM to all child processes
-    if (kill(0, SIGTERM) == -1) {
-        perror("Main: Could not terminate child processes");
-    }
 }
 
 int rand_range(const int min, const int max) {
@@ -638,7 +633,7 @@ int main(void) {
         printf("Main: Waiting %d minutes before starting application %d\n", delay, application_id);
         if (sleep(delay * MINUTE) != 0) {
             printf("Main: Could not sleep\n");
-            return 1;
+            break;
         }
 
         const pid_t application_pid = fork();
@@ -658,6 +653,7 @@ int main(void) {
         const pid_t pid = wait(&status);
         if (pid == -1) {
             perror("Main: Could not wait for child process to exit");
+            break;
         }
 
         if (WIFEXITED(status)) {
