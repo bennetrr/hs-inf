@@ -1,3 +1,4 @@
+#include <errno.h>
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -12,14 +13,14 @@ static constexpr size_t QUEUE_SIZE = 5;
 static constexpr int PRINTER_COUNT = 2;
 static constexpr int TOTAL_CHILD_PROCESS_COUNT = APPLICATION_COUNT + PRINTER_COUNT + 1;
 
-static constexpr int PENDING_JOBS_SHM_KEY = 424242424;
-static constexpr int PRINTING_JOBS_SHM_KEY = 434343434;
-static constexpr int PENDING_JOBS_MUTEX_SEM_KEY = 444444444;
-static constexpr int PENDING_JOBS_FREE_SEM_KEY = 454545454;
-static constexpr int PENDING_JOBS_WAITING_SEM_KEY = 464646464;
-static constexpr int PRINTER_MUTEX_SEM_KEY = 474747474;
+static constexpr int PENDING_JOBS_SHM_KEY = 0x19496CF8; // This is 424242424 in hex because ipcs displays keys in hex
+static constexpr int PRINTING_JOBS_SHM_KEY = 0x19E38E0A;
+static constexpr int PENDING_JOBS_MUTEX_SEM_KEY = 0x1A7DAF1C;
+static constexpr int PENDING_JOBS_FREE_SEM_KEY = 0x1B17D02E;
+static constexpr int PENDING_JOBS_WAITING_SEM_KEY = 0x1BB1F140;
+static constexpr int PRINTER_MUTEX_SEM_KEY = 0x1C4C1252;
 
-static volatile bool should_terminate = false;
+static bool should_terminate = false;
 
 void loop_signal_handler(const int signal) {
     printf("Child process %d: Received signal %d\n", getpid(), signal);
@@ -29,7 +30,8 @@ void loop_signal_handler(const int signal) {
 void main_signal_handler(const int signal) {
     printf("Main: Received signal %d", signal);
 
-    if (kill(0, SIGTERM) == -1) { // This sends SIGTERM to all child processes
+    // This sends SIGTERM to all child processes
+    if (kill(0, SIGTERM) == -1) {
         perror("Main: Could not terminate child processes");
     }
 }
@@ -114,13 +116,13 @@ int spooler() {
 
     pending_jobs_shm_handle = shm_create(PENDING_JOBS_SHM_KEY, sizeof(struct Queue));
     if (pending_jobs_shm_handle == -1) {
-        perror("Spooler: Could not create shared memory");
+        perror("Spooler: Could not create pending jobs queue shared memory");
         exit_code = 1;
         goto exit;
     }
     pending_jobs = shm_attach(pending_jobs_shm_handle);
     if ((intptr_t) pending_jobs == -1) {
-        perror("Spooler: Could not attach shared memory");
+        perror("Spooler: Could not attach pending jobs queue shared memory");
         exit_code = 1;
         pending_jobs = nullptr;
         goto exit;
@@ -129,13 +131,13 @@ int spooler() {
 
     printing_jobs_shm_handle = shm_create(PRINTING_JOBS_SHM_KEY, sizeof(struct PrintJob[PRINTER_COUNT]));
     if (printing_jobs_shm_handle == -1) {
-        perror("Spooler: Could not create shared memory");
+        perror("Spooler: Could not create printing jobs shared memory");
         exit_code = 1;
         goto exit;
     }
     printing_jobs = shm_attach(printing_jobs_shm_handle);
     if ((intptr_t) printing_jobs == -1) {
-        perror("Spooler: Could not attach shared memory");
+        perror("Spooler: Could not attach printing jobs shared memory");
         exit_code = 1;
         printing_jobs = nullptr;
         goto exit;
@@ -143,48 +145,48 @@ int spooler() {
 
     pending_jobs_mutex = sem_create(PENDING_JOBS_MUTEX_SEM_KEY);
     if (pending_jobs_mutex == -1) {
-        perror("Spooler: Could not create semaphore");
+        perror("Spooler: Could not create pending jobs mutex semaphore");
         exit_code = 1;
         goto exit;
     }
     if (sem_set(pending_jobs_mutex, 1) == -1) {
-        perror("Spooler: Could not initialize semaphore");
+        perror("Spooler: Could not initialize pending jobs mutex semaphore");
         exit_code = 1;
         goto exit;
     }
 
     pending_jobs_free = sem_create(PENDING_JOBS_FREE_SEM_KEY);
     if (pending_jobs_free == -1) {
-        perror("Spooler: Could not create semaphore");
+        perror("Spooler: Could not create pending jobs free semaphore");
         exit_code = 1;
         goto exit;
     }
     if (sem_set(pending_jobs_free, QUEUE_SIZE) == -1) {
-        perror("Spooler: Could not initialize semaphore");
+        perror("Spooler: Could not initialize pending jobs free semaphore");
         exit_code = 1;
         goto exit;
     }
 
     pending_jobs_waiting = sem_create(PENDING_JOBS_WAITING_SEM_KEY);
     if (pending_jobs_waiting == -1) {
-        perror("Spooler: Could not create semaphore");
+        perror("Spooler: Could not create pending jobs waiting semaphore");
         exit_code = 1;
         goto exit;
     }
     if (sem_set(pending_jobs_waiting, 0) == -1) {
-        perror("Spooler: Could not initialize semaphore");
+        perror("Spooler: Could not initialize pending jobs waiting semaphore");
         exit_code = 1;
         goto exit;
     }
 
     printer_mutex = semset_create(PRINTER_MUTEX_SEM_KEY, PRINTER_COUNT);
     if (printer_mutex == -1) {
-        perror("Spooler: Could not create semaphore");
+        perror("Spooler: Could not create printer mutex semaphore");
         exit_code = 1;
         goto exit;
     }
     if (semset_set_all(printer_mutex, (unsigned short[]){0, 0}) == -1) {
-        perror("Spooler: Could not initialize semaphore");
+        perror("Spooler: Could not initialize printer mutex semaphore");
         exit_code = 1;
         goto exit;
     }
@@ -194,23 +196,66 @@ int spooler() {
     // Main loop
     while (!should_terminate) {
         printf("Spooler: Waiting for pending print jobs\n");
-        sem_wait(pending_jobs_waiting);
+        if (sem_wait(pending_jobs_waiting) == -1) {
+            if (errno == EINTR && should_terminate) {
+                // EINTR means the wait operation was interrupted by a signal
+                break;
+            }
+            perror("Spooler: Could not wait for pending print jobs");
+            exit_code = 2;
+            break;
+        }
 
         printf("Spooler: Waiting for printer %d to be available\n", current_printer_id);
-        semset_wait(printer_mutex, current_printer_id);
+        if (semset_wait(printer_mutex, current_printer_id) == -1) {
+            if (errno == EINTR && should_terminate) {
+                break;
+            }
+            perror("Spooler: Could not wait for printer");
+            exit_code = 2;
+            break;
+        }
 
         printf("Spooler: Waiting for access to pending jobs queue\n");
-        sem_wait(pending_jobs_mutex);
+        if (sem_wait(pending_jobs_mutex) == -1) {
+            if (errno == EINTR && should_terminate) {
+                break;
+            }
+            perror("Spooler: Could not wait for access to pending jobs queue");
+            exit_code = 2;
+            break;
+        }
         struct PrintJob current_job;
-        queue_get(pending_jobs, &current_job);
+        if (queue_get(pending_jobs, &current_job) == -1) {
+            printf("Spooler: Could not get first item of pending jobs queue: Queue is empty\n");
+            exit_code = 2;
+            break;
+        }
         printing_jobs[current_printer_id] = current_job;
-        sem_signal(pending_jobs_mutex);
-        printf("Spooler: Wrote print job to printer %d (data: %d, pages: %d)\n", current_printer_id, current_job.data, current_job.pageCount);
+        if (sem_signal(pending_jobs_mutex) == -1) {
+            perror("Spooler: Could not release access to pending jobs queue");
+            exit_code = 2;
+            break;
+        }
+        printf(
+            "Spooler: Wrote print job to printer %d (data: %d, pages: %d)\n",
+            current_printer_id,
+            current_job.data,
+            current_job.pageCount);
 
         printf("Spooler: Signaling free space in pending job queue\n");
-        sem_signal(pending_jobs_free);
+        if (sem_signal(pending_jobs_free) == -1) {
+            perror("Spooler: Could not signal a free space in pending job queue");
+            exit_code = 2;
+            break;
+        }
+
         printf("Spooler: Signaling new print job to printer %d\n", current_printer_id);
-        semset_signal(printer_mutex, current_printer_id);
+        if (semset_signal(printer_mutex, current_printer_id) == -1) {
+            perror("Spooler: Could not signal new job to printer");
+            exit_code = 2;
+            break;
+        }
 
         current_printer_id = (current_printer_id + 1) % PRINTER_COUNT;
     }
@@ -219,38 +264,34 @@ int spooler() {
 exit:
     printf("Spooler: Cleaning up resources\n");
 
-    if (killpg(getppid(), SIGTERM) == -1) {
-        perror("Spooler: Could not terminate sibling processes");
-    }
-
     if (pending_jobs != nullptr && shm_detach(pending_jobs) == -1) {
-        perror("Spooler: Could not detach shared memory");
+        perror("Spooler: Could not detach pending jobs queue shared memory");
     }
     if (pending_jobs_shm_handle != -1 && shm_delete(pending_jobs_shm_handle) == -1) {
-        perror("Spooler: Could not delete shared memory");
+        perror("Spooler: Could not delete pending jobs queue shared memory");
     }
 
     if (printing_jobs != nullptr && shm_detach(printing_jobs) == -1) {
-        perror("Spooler: Could not detach shared memory");
+        perror("Spooler: Could not detach printing jobs shared memory");
     }
     if (printing_jobs_shm_handle != -1 && shm_delete(printing_jobs_shm_handle) == -1) {
-        perror("Spooler: Could not delete shared memory");
+        perror("Spooler: Could not delete printing jobs shared memory");
     }
 
     if (pending_jobs_mutex != -1 && sem_delete(pending_jobs_mutex) == -1) {
-        perror("Spooler: Could not delete semaphore");
+        perror("Spooler: Could not delete pending jobs mutex semaphore");
     }
 
     if (pending_jobs_free != -1 && sem_delete(pending_jobs_free) == -1) {
-        perror("Spooler: Could not delete semaphore");
+        perror("Spooler: Could not delete pending jobs free semaphore");
     }
 
     if (pending_jobs_waiting != -1 && sem_delete(pending_jobs_waiting) == -1) {
-        perror("Spooler: Could not delete semaphore");
+        perror("Spooler: Could not delete pending jobs waiting semaphore");
     }
 
     if (printer_mutex != -1 && sem_delete(printer_mutex) == -1) {
-        perror("Spooler: Could not delete semaphore");
+        perror("Spooler: Could not delete printer mutex semaphore");
     }
 
     printf("Spooler: Exiting with code %d (PID was %d)\n", exit_code, getpid());
@@ -287,7 +328,7 @@ int printer(const int printer_id) {
     const int printing_jobs_shm_handle = shm_get_handle(PRINTING_JOBS_SHM_KEY);
     if (printing_jobs_shm_handle == -1) {
         char perror_msg[128];
-        snprintf(perror_msg, sizeof(perror_msg), "Printer %d: Could not get shared memory", printer_id);
+        snprintf(perror_msg, sizeof(perror_msg), "Printer %d: Could not get printing jobs shared memory", printer_id);
         perror(perror_msg);
         exit_code = 1;
         goto exit;
@@ -295,7 +336,11 @@ int printer(const int printer_id) {
     printing_jobs = shm_attach(printing_jobs_shm_handle);
     if ((intptr_t) printing_jobs == -1) {
         char perror_msg[128];
-        snprintf(perror_msg, sizeof(perror_msg), "Printer %d: Could not attach shared memory", printer_id);
+        snprintf(
+            perror_msg,
+            sizeof(perror_msg),
+            "Printer %d: Could not attach printing jobs shared memory",
+            printer_id);
         perror(perror_msg);
         exit_code = 1;
         printing_jobs = nullptr;
@@ -305,7 +350,7 @@ int printer(const int printer_id) {
     const int printer_mutex = sem_get_handle(PRINTER_MUTEX_SEM_KEY);
     if (printer_mutex == -1) {
         char perror_msg[128];
-        snprintf(perror_msg, sizeof(perror_msg), "Printer %d: Could not get semaphore", printer_id);
+        snprintf(perror_msg, sizeof(perror_msg), "Printer %d: Could not get printer mutex semaphore", printer_id);
         perror(perror_msg);
         exit_code = 1;
         goto exit;
@@ -316,17 +361,35 @@ int printer(const int printer_id) {
     // Main loop
     while (!should_terminate) {
         printf("Printer %d: Waiting for job\n", printer_id);
-        semset_wait(printer_mutex, printer_id);
+        if (semset_wait(printer_mutex, printer_id) == -1) {
+            if (errno == EINTR && should_terminate) {
+                break;
+            }
+            char perror_msg[128];
+            snprintf(perror_msg, sizeof(perror_msg), "Printer %d: Could not wait for job", printer_id);
+            perror(perror_msg);
+            exit_code = 2;
+            break;
+        }
         const struct PrintJob print_job = printing_jobs[printer_id];
 
         // Printing: 1 Minute / page
         for (int page = 0; page < print_job.pageCount; page++) {
             printf("Printer %d: Printing page %d (data: %d)\n", printer_id, page, print_job.data);
-            sleep(1 * MINUTE);
+
+            if (sleep(1 * MINUTE) != 0 && should_terminate) {
+                break;
+            }
         }
 
         printf("Printer %d: Finished printing\n", printer_id);
-        semset_signal(printer_mutex, printer_id);
+        if (semset_signal(printer_mutex, printer_id) == -1) {
+            char perror_msg[128];
+            snprintf(perror_msg, sizeof(perror_msg), "Printer %d: Could not signal readiness", printer_id);
+            perror(perror_msg);
+            exit_code = 2;
+            break;
+        }
     }
 
     // Cleanup
@@ -335,7 +398,11 @@ exit:
 
     if (printing_jobs != nullptr && shm_detach(printing_jobs) == -1) {
         char perror_msg[128];
-        snprintf(perror_msg, sizeof(perror_msg), "Printer %d: Could not detach shared memory", printer_id);
+        snprintf(
+            perror_msg,
+            sizeof(perror_msg),
+            "Printer %d: Could not detach printing jobs shared memory",
+            printer_id);
         perror(perror_msg);
     }
 
@@ -355,7 +422,11 @@ int print(const struct PrintJob print_job) {
     const int pending_jobs_shm_handle = shm_get_handle(PENDING_JOBS_SHM_KEY);
     if (pending_jobs_shm_handle == -1) {
         char perror_msg[128];
-        snprintf(perror_msg, sizeof(perror_msg), "print() for application %d: Could not create shared memory", pid);
+        snprintf(
+            perror_msg,
+            sizeof(perror_msg),
+            "print() for application %d: Could not get pending jobs queue shared memory",
+            pid);
         perror(perror_msg);
         exit_code = -1;
         goto exit;
@@ -363,35 +434,51 @@ int print(const struct PrintJob print_job) {
     pending_jobs = shm_attach(pending_jobs_shm_handle);
     if ((intptr_t) pending_jobs == -1) {
         char perror_msg[128];
-        snprintf(perror_msg, sizeof(perror_msg), "print() for application %d: Could not attach shared memory", pid);
+        snprintf(
+            perror_msg,
+            sizeof(perror_msg),
+            "print() for application %d: Could not attach pending jobs queue shared memory",
+            pid);
         perror(perror_msg);
         exit_code = -1;
         pending_jobs = nullptr;
         goto exit;
     }
 
-    const int pending_jobs_mutex = sem_create(PENDING_JOBS_MUTEX_SEM_KEY);
+    const int pending_jobs_mutex = sem_get_handle(PENDING_JOBS_MUTEX_SEM_KEY);
     if (pending_jobs_mutex == -1) {
         char perror_msg[128];
-        snprintf(perror_msg, sizeof(perror_msg), "print() for application %d: Could not create semaphore", pid);
+        snprintf(
+            perror_msg,
+            sizeof(perror_msg),
+            "print() for application %d: Could not get pending jobs mutex semaphore",
+            pid);
         perror(perror_msg);
         exit_code = -1;
         goto exit;
     }
 
-    const int pending_jobs_free = sem_create(PENDING_JOBS_FREE_SEM_KEY);
+    const int pending_jobs_free = sem_get_handle(PENDING_JOBS_FREE_SEM_KEY);
     if (pending_jobs_free == -1) {
         char perror_msg[128];
-        snprintf(perror_msg, sizeof(perror_msg), "print() for application %d: Could not create semaphore", pid);
+        snprintf(
+            perror_msg,
+            sizeof(perror_msg),
+            "print() for application %d: Could not get pending jobs free semaphore",
+            pid);
         perror(perror_msg);
         exit_code = -1;
         goto exit;
     }
 
-    const int pending_jobs_waiting = sem_create(PENDING_JOBS_WAITING_SEM_KEY);
+    const int pending_jobs_waiting = sem_get_handle(PENDING_JOBS_WAITING_SEM_KEY);
     if (pending_jobs_waiting == -1) {
         char perror_msg[128];
-        snprintf(perror_msg, sizeof(perror_msg), "print() for application %d: Could not create semaphore", pid);
+        snprintf(
+            perror_msg,
+            sizeof(perror_msg),
+            "print() for application %d: Could not get pending jobs waiting semaphore",
+            pid);
         perror(perror_msg);
         exit_code = -1;
         goto exit;
@@ -401,16 +488,62 @@ int print(const struct PrintJob print_job) {
 
     // Main function
     printf("print() for application %d: Waiting for space in pending jobs queue\n", pid);
-    sem_wait(pending_jobs_free);
+    if (sem_wait(pending_jobs_free) == -1) {
+        char perror_msg[128];
+        snprintf(
+            perror_msg,
+            sizeof(perror_msg),
+            "print() for application %d: Could not wait for space in pending jobs queue",
+            pid);
+        perror(perror_msg);
+        exit_code = -1;
+        goto exit;
+    }
 
     printf("print() for application %d: Waiting for access to pending jobs queue\n", pid);
-    sem_wait(pending_jobs_mutex);
-    queue_put(pending_jobs, print_job);
-    sem_signal(pending_jobs_mutex);
+    if (sem_wait(pending_jobs_mutex) == -1) {
+        char perror_msg[128];
+        snprintf(
+            perror_msg,
+            sizeof(perror_msg),
+            "print() for application %d: Could not wait for access to pending jobs queue",
+            pid);
+        perror(perror_msg);
+        exit_code = -1;
+        goto exit;
+    }
+
+    if (queue_put(pending_jobs, print_job) == -1) {
+        printf("print() for application %d: Could not put job into queue: Queue is full\n", pid);
+        exit_code = -1;
+        goto exit;
+    }
+
+    if (sem_signal(pending_jobs_mutex) == -1) {
+        char perror_msg[128];
+        snprintf(
+            perror_msg,
+            sizeof(perror_msg),
+            "print() for application %d: Could not release access for pending jobs queue",
+            pid);
+        perror(perror_msg);
+        exit_code = -1;
+        goto exit;
+    }
     printf("print() for application %d: Wrote print job to queue\n", pid);
 
     printf("print() for application %d: Signaling waiting print job to spooler\n", pid);
-    sem_signal(pending_jobs_waiting);
+    if (sem_signal(pending_jobs_waiting) == -1) {
+        char perror_msg[128];
+        snprintf(
+            perror_msg,
+            sizeof(perror_msg),
+            "print() for application %d: Could not signal new job to spooler",
+            pid);
+        perror(perror_msg);
+        exit_code = -1;
+        goto exit;
+    }
 
     // Cleanup
 exit:
@@ -418,7 +551,11 @@ exit:
 
     if (pending_jobs != nullptr && shm_detach(pending_jobs) == -1) {
         char perror_msg[128];
-        snprintf(perror_msg, sizeof(perror_msg), "print() for application %d: Could not detach shared memory", pid);
+        snprintf(
+            perror_msg,
+            sizeof(perror_msg),
+            "print() for application %d: Could not detach pending jobs queue shared memory",
+            pid);
         perror(perror_msg);
     }
 
@@ -448,13 +585,28 @@ int application() {
 }
 
 int main(void) {
+    printf("Main: Started with PID %d", getpid());
+
+    struct sigaction sa;
+    sa.sa_handler = main_signal_handler;
+    sigemptyset(&sa.sa_mask);
+    sa.sa_flags = 0;
+    if (sigaction(SIGINT, &sa, nullptr) == -1) {
+        perror("Main: Could not install SIGINT handler");
+        return 1;
+    }
+    if (sigaction(SIGTERM, &sa, nullptr) == -1) {
+        perror("Main: Could not install SIGTERM handler");
+        return 1;
+    }
+
     sranddev(); // Initializes the random number generator with a random seed
 
     printf("Main: Starting spooler\n");
     const pid_t spooler_pid = fork();
     if (spooler_pid == -1) {
         perror("Main: Could not fork spooler process");
-        return -1;
+        return 1;
     }
     if (spooler_pid == 0) {
         return spooler();
@@ -462,33 +614,43 @@ int main(void) {
     printf("Main: Started spooler with PID %d\n", spooler_pid);
 
     for (int printer_id = 0; printer_id < PRINTER_COUNT; printer_id++) {
+        printf("Main: Starting printer %d (%d out of %d)\n", printer_id, printer_id + 1, PRINTER_COUNT);
+
         const pid_t printer_pid = fork();
         if (printer_pid == -1) {
             perror("Main: Could not fork printer process");
-            return -1;
+            return 1;
         }
         if (printer_pid == 0) {
             return printer(printer_id);
         }
 
-        printf("Main: Started printer %d out of %d with PID %d\n", printer_id, PRINTER_COUNT, spooler_pid);
+        printf(
+            "Main: Started printer %d (%d out of %d) with PID %d\n",
+            printer_id,
+            printer_id + 1,
+            PRINTER_COUNT,
+            printer_pid);
     }
 
     for (int application_id = 0; application_id < APPLICATION_COUNT; application_id++) {
         const int delay = rand_range(0, 4);
         printf("Main: Waiting %d minutes before starting application %d\n", delay, application_id);
-        sleep(delay * MINUTE);
+        if (sleep(delay * MINUTE) != 0) {
+            printf("Main: Could not sleep\n");
+            return 1;
+        }
 
         const pid_t application_pid = fork();
         if (application_pid == -1) {
             perror("Main: Could not fork application process");
-            return -1;
+            return 1;
         }
         if (application_pid == 0) {
             return application();
         }
 
-        printf("Main: Started application %d out of %d with PID %d\n", application_id, APPLICATION_COUNT, spooler_pid);
+        printf("Main: Started application %d out of %d with PID %d\n", application_id, APPLICATION_COUNT, application_pid);
     }
 
     for (int i = 0; i < TOTAL_CHILD_PROCESS_COUNT; i++) {
@@ -498,7 +660,11 @@ int main(void) {
             perror("Main: Could not wait for child process to exit");
         }
 
-        printf("Main: Child process %d exited with status %d\n", pid, status);
+        if (WIFEXITED(status)) {
+            printf("Main: Child process %d exited with status %d\n", pid, WEXITSTATUS(status));
+        } else {
+            printf("Main: Child process %d exited with signal %d\n", pid, WTERMSIG(status));
+        }
     }
 
     return 0;

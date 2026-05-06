@@ -2,7 +2,7 @@
 
 // Creates a semaphore set with n semaphores and returns the handle, or -1 if the creation failed
 int semset_create(const int key, const int n) {
-    return semget(key, n, 0666 | IPC_CREAT);
+    return semget(key, n, 0666 | IPC_CREAT | IPC_EXCL);
 }
 
 // Sets the value of the semaphore associated with the handle and index. Returns 0 on success and -1 on failure
