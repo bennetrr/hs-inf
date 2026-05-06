@@ -15,7 +15,7 @@ int main(const int argc, const char *argv[]) {
     const pid_t pid1 = fork();
     if (pid1 == -1) {
         // perror() appends the textual representation of errno to the message
-        perror("fork failed");
+        perror("fork of child process 1 failed");
         return 1;
     }
     if (pid1 == 0) {
@@ -25,7 +25,7 @@ int main(const int argc, const char *argv[]) {
 
     const pid_t pid2 = fork();
     if (pid2 == -1) {
-        perror("fork failed");
+        perror("fork of child process 2 failed");
         return 1;
     }
     if (pid2 == 0) {
@@ -35,7 +35,7 @@ int main(const int argc, const char *argv[]) {
 
     const pid_t pid3 = fork();
     if (pid3 == -1) {
-        perror("fork failed");
+        perror("fork of child process 3 failed");
         return 1;
     }
     if (pid3 == 0) {
@@ -46,21 +46,39 @@ int main(const int argc, const char *argv[]) {
 
     sleep(2);
 
-    kill(pid1, SIGTERM);
-    kill(pid2, SIGKILL);
-    kill(pid3, SIGKILL);
-    
+    if (kill(pid1, SIGTERM) == -1) {
+        perror("kill of child process 1 failed");
+    }
+    if (kill(pid2, SIGKILL) == -1) {
+        perror("kill of child process 2 failed");
+    }
+    if (kill(pid3, SIGKILL) == -1) {
+        perror("kill of child process 3 failed");
+    }
+
     int status1 = 0;
     const pid_t wait_pid1 = wait(&status1);
-    printf("child process with PID %d exited with %d\n", wait_pid1, status1);
-    
+    if (wait_pid1 == -1) {
+        perror("wait 1 failed");
+    } else {
+        printf("child process with PID %d exited with %d\n", wait_pid1, status1);
+    }
+
     int status2 = 0;
     const pid_t wait_pid2 = wait(&status2);
-    printf("child process with PID %d exited with %d\n", wait_pid2, status2);
-    
+    if (wait_pid1 == -1) {
+        perror("wait 2 failed");
+    } else {
+        printf("child process with PID %d exited with %d\n", wait_pid2, status2);
+    }
+
     int status3 = 0;
     const pid_t wait_pid3 = wait(&status3);
-    printf("child process with PID %d exited with %d\n", wait_pid3, status3);
+    if (wait_pid1 == -1) {
+        perror("wait 3 failed");
+    } else {
+        printf("child process with PID %d exited with %d\n", wait_pid3, status3);
+    }
 
     // Expected outputs:
     // child process 1: 15, because killed with SIGTERM (15)

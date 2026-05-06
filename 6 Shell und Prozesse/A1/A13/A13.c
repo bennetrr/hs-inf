@@ -55,26 +55,27 @@ int main(void) {
 			tail->surname = surname;
 			tail->next = nullptr;
 			tail->prev = oldTail;
+			oldTail->next = tail;
+		}
+	}
+
+	{
+		const struct Item *current = tail;
+		while (current) {
+			printf("%s %s\n", current->name, current->surname);
+			current = current->prev;
 		}
 	}
 
 	{
 		struct Item *current = tail;
-		do {
-			printf("%s %s\n", current->name, current->surname);
-			current = current->prev;
-		} while (current);
-	}
-
-	{
-		struct Item *current = tail;
-		do {
+		while (current) {
 			struct Item *next = current->prev;
 			free(current->name);
 			free(current->surname);
 			free(current);
 			current = next;
-		} while (current);
+		}
 	}
 
 	return 0;

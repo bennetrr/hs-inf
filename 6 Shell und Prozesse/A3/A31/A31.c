@@ -28,7 +28,7 @@ int main(void) {
         perror("Could not create semaphore");
         return 1;
     }
-    if (semset_set_all(sem_handle, (unsigned short[]){ 0, 0 }) == -1) {
+    if (semset_set_all(sem_handle, (unsigned short[]){0, 0}) == -1) {
         perror("Could not initialize semaphore");
         return 1;
     }

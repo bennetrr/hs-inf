@@ -602,7 +602,11 @@ int application(int application_id) {
     print_job.pageCount = rand_range(2, 6);
     print_job.data = rand();
 
-    printf("Application %d: Printing job with %d pages and data of %d\n", application_id, print_job.pageCount, print_job.data);
+    printf(
+        "Application %d: Printing job with %d pages and data of %d\n",
+        application_id,
+        print_job.pageCount,
+        print_job.data);
 
     if (print(print_job) == -1) {
         printf("Application %d: Error while printing\n", application_id);

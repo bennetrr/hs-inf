@@ -21,6 +21,6 @@ void *shm_attach(const int handle) {
 }
 
 // Detach the shared memory to the process and return 0 on success or -1 on error
-int shm_detach(const void* pointer) {
+int shm_detach(const void *pointer) {
     return shmdt(pointer);
 }

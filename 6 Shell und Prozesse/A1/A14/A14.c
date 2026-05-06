@@ -11,7 +11,7 @@ struct Item {
 
 size_t get_input(char **buffer, FILE *fp) {
 	size_t len = 0;
-	size_t res = getline(buffer, &len, fp);
+	const size_t res = getline(buffer, &len, fp);
 	(*buffer)[strcspn(*buffer, "\n")] = '\0';
 	return res;
 }
@@ -54,6 +54,7 @@ int main(void) {
 			tail->surname = surname;
 			tail->next = nullptr;
 			tail->prev = oldTail;
+			oldTail->next = tail;
 		}
 	}
 
@@ -64,22 +65,22 @@ int main(void) {
 			return 1;
 		}
 
-		struct Item *current = tail;
-		do {
+		const struct Item *current = tail;
+		while (current) {
 			fprintf(wfile, "%s %s\n", current->name, current->surname);
 			current = current->prev;
-		} while (current);
+		}
 	}
 
 	{
 		struct Item *current = tail;
-		do {
+		while (current) {
 			struct Item *next = current->prev;
 			free(current->name);
 			free(current->surname);
 			free(current);
 			current = next;
-		} while (current);
+		}
 	}
 
 	return 0;

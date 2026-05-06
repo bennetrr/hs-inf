@@ -31,7 +31,7 @@ int main(void) {
         return 1;
     }
 
-    printf("Started with PID %d...\n", getpid());
+    printf("Started with PID %d\n", getpid());
     printf("When receiving SIGTERM or SIGINT 3 times, this program exits with code 5\n");
 
     while (true);

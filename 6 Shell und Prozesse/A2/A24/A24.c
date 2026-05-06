@@ -10,13 +10,15 @@ int main(const int argc, char *argv[]) {
     }
 
     if (child_pid == 0) {
-        execv("./A24.child", argv);
+        execv("./A24.child.out", argv);
         perror("execv failed");
         return 1;
     }
 
     int child_status = 0;
-    waitpid(child_pid, &child_status, 0);
+    if (waitpid(child_pid, &child_status, 0) == -1) {
+        perror("wait failed");
+    }
 
     if (WIFEXITED(child_status)) {
         printf("child process %d exited with %d\n", child_pid, WEXITSTATUS(child_status));

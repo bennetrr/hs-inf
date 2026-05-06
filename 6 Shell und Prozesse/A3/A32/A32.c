@@ -7,7 +7,7 @@
 static constexpr int PENDING_JOBS_SHM_KEY = 424242424;
 
 int child_process(const int shared_memory_handle, const int iterations) {
-    const int* shared_memory = shm_attach(shared_memory_handle);
+    const int *shared_memory = shm_attach(shared_memory_handle);
 
     for (int i = 0; i < iterations; ++i) {
         printf("Leser    %d: %d\n", i, *shared_memory);
@@ -42,7 +42,7 @@ int main(const int argc, const char *argv[]) {
         return child_process(shared_memory_handle, iterations);
     }
 
-    int* shared_memory = shm_attach(shared_memory_handle);
+    int *shared_memory = shm_attach(shared_memory_handle);
 
     for (int i = 0; i < iterations; ++i) {
         *shared_memory = rand();

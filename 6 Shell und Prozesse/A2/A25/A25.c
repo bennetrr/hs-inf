@@ -22,8 +22,7 @@ size_t str_count_char(const char *str, const char c) {
     }
 
     size_t count = 0;
-    for (size_t i = 0; str[i] != '\0'; i++)
-    {
+    for (size_t i = 0; str[i] != '\0'; i++) {
         if (str[i] == c) {
             ++count;
         }
@@ -42,7 +41,8 @@ size_t split_cmdline(char **argv, const size_t estimated_argc, char *cmdline) {
     size_t argc = 0;
 
     while (token != nullptr) {
-        if (argc >= estimated_argc - 1) { // This should not happen, but just in case
+        // This should not happen, but just in case
+        if (argc >= estimated_argc - 1) {
             break;
         }
 
@@ -114,7 +114,8 @@ bool get_absolute_path_of_executable(char *executable_path, const char *argv0) {
     }
 
     char path[strlen(path_ro) + 1]; // strlen does not include the NUL character
-    strlcpy(path, path_ro, sizeof(path)); // From the manpage: The application should not modify the string pointed to by getenv()
+    // From the manpage: The application should not modify the string pointed to by getenv()
+    strlcpy(path, path_ro, sizeof(path));
 
     char *token = strtok(path, ":");
     while (token != nullptr) {
@@ -194,19 +195,22 @@ int process_cmdline(char *cmdline) {
 
 int main(void) {
     while (true) {
+        // PATH_MAX is the maximum number of chars a path can have
         char cwd[PATH_MAX]; // This way cwd does not need to be freed manually (thanks Nico!)
-        if (getcwd(cwd, PATH_MAX) == nullptr) { // PATH_MAX is the maximum number of chars a path can have
+        if (getcwd(cwd, PATH_MAX) == nullptr) {
             perror("Could not get current working directory");
             return 1;
         }
 
-        fprintf(stderr, "\033[94m%s\033[0m \033[32m> \033[0m", cwd); // Fancy color codes: https://stackoverflow.com/a/33206814
+        // Fancy color codes: https://stackoverflow.com/a/33206814
+        fprintf(stderr, "\033[94m%s\033[0m \033[32m> \033[0m", cwd);
 
         char *cmdline = nullptr;
         if (get_input(&cmdline) == -1) {
             free(cmdline);
 
-            if (feof(stdin)) { // Handles EOF / CTRL+D
+            // Handles EOF / CTRL+D
+            if (feof(stdin)) {
                 fprintf(stderr, "\n");
                 return 0;
             }
