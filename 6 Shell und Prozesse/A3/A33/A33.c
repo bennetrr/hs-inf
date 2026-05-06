@@ -8,7 +8,7 @@
 #include "../shm_helpers.c"
 
 static constexpr int MINUTE = 60;
-static constexpr int APPLICATION_COUNT = 5;
+static constexpr int APPLICATION_COUNT = 10;
 static constexpr size_t QUEUE_SIZE = 5;
 static constexpr int PRINTER_COUNT = 2;
 static constexpr int TOTAL_CHILD_PROCESS_COUNT = APPLICATION_COUNT + PRINTER_COUNT + 1;
@@ -28,7 +28,7 @@ void loop_signal_handler(const int signal) {
 }
 
 void main_signal_handler(const int signal) {
-    printf("Main: Received signal %d", signal);
+    printf("Main: Received signal %d\n", signal);
 
     // This sends SIGTERM to all child processes
     if (kill(0, SIGTERM) == -1) {
@@ -585,7 +585,7 @@ int application() {
 }
 
 int main(void) {
-    printf("Main: Started with PID %d", getpid());
+    printf("Main: Started with PID %d\n", getpid());
 
     struct sigaction sa;
     sa.sa_handler = main_signal_handler;
