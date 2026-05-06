@@ -710,9 +710,19 @@ int main(void) {
         }
 
         if (WIFEXITED(status)) {
-            printf("Main: Child process %d exited with status %d\n", pid, WEXITSTATUS(status));
+            printf(
+                "Main: Child process %d exited with status %d (%d out of %d)\n",
+                pid,
+                WEXITSTATUS(status),
+                i + 1,
+                TOTAL_CHILD_PROCESS_COUNT);
         } else {
-            printf("Main: Child process %d exited with signal %d\n", pid, WTERMSIG(status));
+            printf(
+                "Main: Child process %d exited with signal %d (%d out of %d)\n",
+                pid,
+                WTERMSIG(status),
+                i + 1,
+                TOTAL_CHILD_PROCESS_COUNT);
         }
     }
 
