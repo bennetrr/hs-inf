@@ -667,7 +667,12 @@ int main(void) {
 
     for (int application_id = 0; application_id < APPLICATION_COUNT; application_id++) {
         const int delay = rand_range(0, 4);
-        printf("Main: Waiting %d minutes before starting application %d\n", delay, application_id);
+        printf(
+            "Main: Waiting %d minutes before starting application %d (%d out of %d)\n",
+            delay,
+            application_id,
+            application_id + 1,
+            APPLICATION_COUNT);
         if (sleep(delay * MINUTE) != 0) {
             printf("Main: Could not sleep\n");
             break;
@@ -682,7 +687,12 @@ int main(void) {
             return application(application_id);
         }
 
-        printf("Main: Started application %d out of %d with PID %d\n", application_id, APPLICATION_COUNT, application_pid);
+        printf(
+            "Main: Started application %d (%d out of %d) with PID %d\n",
+            application_id,
+            application_id + 1,
+            APPLICATION_COUNT,
+            application_pid);
     }
 
     for (int i = 0; i < TOTAL_CHILD_PROCESS_COUNT; i++) {
