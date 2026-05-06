@@ -616,6 +616,7 @@ int application(int application_id) {
 }
 
 int main(void) {
+    setvbuf(stdout, nullptr, _IONBF, 0); // Disable buffering so printf lines stay in order
     printf("Main: Started with PID %d\n", getpid());
 
     struct sigaction sa;
