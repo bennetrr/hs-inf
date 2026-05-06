@@ -6,8 +6,8 @@ int shm_create(const key_t key, const int size) {
 }
 
 // Returns the handle of the shared memory, or -1 if the shared memory does not exist
-int shm_get_handle(const key_t key, const int size) {
-    return shmget(key, size, 0666);
+int shm_get_handle(const key_t key) {
+    return shmget(key, 0, 0666);
 }
 
 // Deletes the shared memory and returns 0 on success or -1 on error

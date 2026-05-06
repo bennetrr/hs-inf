@@ -41,7 +41,7 @@ int semset_signal(const int handle, const int n) {
 
 // Creates one semaphore and returns the handle, or -1 if the creation failed
 int sem_create(const int key) {
-    return semset_create(key, 0);
+    return semset_create(key, 1);
 }
 
 // Returns the handle of the semaphore or semaphore set, or -1 if the semaphore does not exist
