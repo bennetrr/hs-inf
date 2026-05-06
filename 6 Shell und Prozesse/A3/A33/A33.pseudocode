@@ -1,49 +1,54 @@
-int queue_size = 5
-int printer_count = 2
+int QUEUE_SIZE = 5
+int PRINTER_COUNT = 2
 
-int pending_jobs[queue_size]  // Queue for jobs that need to be printed
-int printing_jobs[printer_count]  // Job that is printed right now on the printer with the given ID
+int pending_jobs[QUEUE_SIZE]                // Queue for jobs that need to be printed
+int printing_jobs[PRINTER_COUNT]            // Job that is printed right now on the printer with the given ID
 
-semaphore pending_jobs_mutex = 1
-semaphore pending_jobs_free = queue_size
-semaphore pending_jobs_waiting = 0
-semaphore printer_mutex[printer_count] = 0  // Whether the printer with the given ID has a job
+semaphore pending_jobs_mutex = 1            // Mutex for pending_jobs
+semaphore pending_jobs_free = QUEUE_SIZE    // Number of free slots in the queue
+semaphore pending_jobs_waiting = 0          // Number of occupied slots in the queue
+semaphore printer_ready[PRINTER_COUNT] = 0  // Whether the printer with the given ID has a job
+semaphore printer_busy[PRINTER_COUNT] = 0   // Whether the printer with the given ID has no job
 
 // Called from an application when it needs to print something
 void print(struct PrintJob print_job) {
-    wait(pending_jobs_free)
+    wait(pending_jobs_free)  // Wait for a free slot in the pending jobs queue
 
-    wait(pending_jobs_mutex)
-    queue_put_h(pending_jobs, print_job)
-    signal(pending_jobs_mutex)
+    wait(pending_jobs_mutex)  // Wait for access to the pending jobs queue
+    queue_put_h(pending_jobs, print_job)  // Put the print job at the end of the queue
+    signal(pending_jobs_mutex)  // Release access to the pending jobs queue
 
-    signal(pending_jobs_waiting)
+    signal(pending_jobs_waiting)  // Signal the new job to the spooler
 }
 
+// Spooler process
 void spooler() {
     int current_printer_id = 0
 
     while (true) {
-        wait(pending_jobs_waiting)
-        wait(printer_mutex[current_printer_id])
+        wait(pending_jobs_waiting)  // Wait for a new job in the pending jobs queue
+        wait(printer_ready[current_printer_id]) // Wait until the selected printer is ready
 
-        wait(pending_jobs_mutex)
-        printing_jobs[current_printer_id] = queue_get_h(pending_jobs)
-        signal(pending_jobs_mutex)
+        wait(pending_jobs_mutex)  // Wait for access to the pending jobs queue
+        printing_jobs[current_printer_id] = queue_get_h(pending_jobs)  // Remove the job from the queue and send it to the printer
+        signal(pending_jobs_mutex)  // Release access to the pending jobs queue
 
-        signal(pending_jobs_free)
-        signal(printer_mutex[current_printer_id])
+        signal(pending_jobs_free)  // Signal the free slot in the pending jobs queue to the applications
+        signal(printer_busy[current_printer_id]) // Signal the new job to the printer
 
-        current_printer_id = (current_printer_id + 1) % printer_count
+        current_printer_id = (current_printer_id + 1) % PRINTER_COUNT // Switch the printer
     }
 }
 
+// Printer process
 void printer(int printer_id) {
+    signal(printer_ready[printer_id])  // Only allow jobs to be sent when the printer is ready
+
     while (true) {
-        wait(printer_mutex[printer_id])
+        wait(printer_busy[printer_id])  // Wait for a job for this printer
 
-        print_h(printing_jobs[printer_id])
+        print_h(printing_jobs[printer_id])  // Do the printing
 
-        signal(printer_mutex[printer_id])
+        signal(printer_ready[printer_id])  // Signal readiness to the spooler
     }
 }

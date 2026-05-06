@@ -8,7 +8,7 @@
 #include "../shm_helpers.c"
 
 static constexpr int MINUTE = 60;
-static constexpr int APPLICATION_COUNT = 10;
+static constexpr int APPLICATION_COUNT = 5;
 static constexpr size_t QUEUE_SIZE = 5;
 static constexpr int PRINTER_COUNT = 2;
 static constexpr int TOTAL_CHILD_PROCESS_COUNT = APPLICATION_COUNT + PRINTER_COUNT + 1;
@@ -18,7 +18,8 @@ static constexpr int PRINTING_JOBS_SHM_KEY = 0x19E38E0A;
 static constexpr int PENDING_JOBS_MUTEX_SEM_KEY = 0x1A7DAF1C;
 static constexpr int PENDING_JOBS_FREE_SEM_KEY = 0x1B17D02E;
 static constexpr int PENDING_JOBS_WAITING_SEM_KEY = 0x1BB1F140;
-static constexpr int PRINTER_MUTEX_SEM_KEY = 0x1C4C1252;
+static constexpr int PRINTER_READY_SEM_KEY = 0x1C4C1252;
+static constexpr int PRINTER_BUSY_SEM_KEY = 0x1CE63364;
 
 static bool should_terminate = false;
 
@@ -91,7 +92,8 @@ int spooler() {
     int pending_jobs_mutex = -1;
     int pending_jobs_free = -1;
     int pending_jobs_waiting = -1;
-    int printer_mutex = -1;
+    int printer_ready = -1;
+    int printer_busy = -1;
     int current_printer_id = 0;
 
     struct sigaction sa;
@@ -174,14 +176,26 @@ int spooler() {
         goto exit;
     }
 
-    printer_mutex = semset_create(PRINTER_MUTEX_SEM_KEY, PRINTER_COUNT);
-    if (printer_mutex == -1) {
-        perror("Spooler: Could not create printer mutex semaphore");
+    printer_ready = semset_create(PRINTER_READY_SEM_KEY, PRINTER_COUNT);
+    if (printer_ready == -1) {
+        perror("Spooler: Could not create printer ready semaphore");
         exit_code = 1;
         goto exit;
     }
-    if (semset_set_all(printer_mutex, (unsigned short[]){0, 0}) == -1) {
-        perror("Spooler: Could not initialize printer mutex semaphore");
+    if (semset_set_all(printer_ready, (unsigned short[]){0, 0}) == -1) {
+        perror("Spooler: Could not initialize printer ready semaphore");
+        exit_code = 1;
+        goto exit;
+    }
+
+    printer_busy = semset_create(PRINTER_BUSY_SEM_KEY, PRINTER_COUNT);
+    if (printer_busy == -1) {
+        perror("Spooler: Could not create printer busy semaphore");
+        exit_code = 1;
+        goto exit;
+    }
+    if (semset_set_all(printer_busy, (unsigned short[]){0, 0}) == -1) {
+        perror("Spooler: Could not initialize printer busy semaphore");
         exit_code = 1;
         goto exit;
     }
@@ -202,7 +216,7 @@ int spooler() {
         }
 
         printf("Spooler: Waiting for printer %d to be available\n", current_printer_id);
-        if (semset_wait(printer_mutex, current_printer_id) == -1) {
+        if (semset_wait(printer_ready, current_printer_id) == -1) {
             if (errno == EINTR && should_terminate) {
                 break;
             }
@@ -238,7 +252,7 @@ int spooler() {
             current_job.data,
             current_job.pageCount);
 
-        printf("Spooler: Signaling free space in pending job queue\n");
+        printf("Spooler: Signaling free slot in pending job queue\n");
         if (sem_signal(pending_jobs_free) == -1) {
             perror("Spooler: Could not signal a free space in pending job queue");
             exit_code = 2;
@@ -246,7 +260,7 @@ int spooler() {
         }
 
         printf("Spooler: Signaling new print job to printer %d\n", current_printer_id);
-        if (semset_signal(printer_mutex, current_printer_id) == -1) {
+        if (semset_signal(printer_busy, current_printer_id) == -1) {
             perror("Spooler: Could not signal new job to printer");
             exit_code = 2;
             break;
@@ -285,8 +299,12 @@ exit:
         perror("Spooler: Could not delete pending jobs waiting semaphore");
     }
 
-    if (printer_mutex != -1 && sem_delete(printer_mutex) == -1) {
-        perror("Spooler: Could not delete printer mutex semaphore");
+    if (printer_ready != -1 && sem_delete(printer_ready) == -1) {
+        perror("Spooler: Could not delete printer ready semaphore");
+    }
+
+    if (printer_busy != -1 && sem_delete(printer_busy) == -1) {
+        perror("Spooler: Could not delete printer busy semaphore");
     }
 
     printf("Spooler: Exiting with code %d (PID was %d)\n", exit_code, getpid());
@@ -342,10 +360,19 @@ int printer(const int printer_id) {
         goto exit;
     }
 
-    const int printer_mutex = sem_get_handle(PRINTER_MUTEX_SEM_KEY);
-    if (printer_mutex == -1) {
+    const int printer_ready = sem_get_handle(PRINTER_READY_SEM_KEY);
+    if (printer_ready == -1) {
         char perror_msg[128];
-        snprintf(perror_msg, sizeof(perror_msg), "Printer %d: Could not get printer mutex semaphore", printer_id);
+        snprintf(perror_msg, sizeof(perror_msg), "Printer %d: Could not get printer ready semaphore", printer_id);
+        perror(perror_msg);
+        exit_code = 1;
+        goto exit;
+    }
+
+    const int printer_busy = sem_get_handle(PRINTER_BUSY_SEM_KEY);
+    if (printer_busy == -1) {
+        char perror_msg[128];
+        snprintf(perror_msg, sizeof(perror_msg), "Printer %d: Could not get printer busy semaphore", printer_id);
         perror(perror_msg);
         exit_code = 1;
         goto exit;
@@ -354,9 +381,18 @@ int printer(const int printer_id) {
     printf("Printer %d: Initialized\n", printer_id);
 
     // Main loop
+    printf("Printer %d: Ready\n", printer_id);
+    if (semset_signal(printer_ready, printer_id) == -1) {
+        char perror_msg[128];
+        snprintf(perror_msg, sizeof(perror_msg), "Printer %d: Could not signal readiness", printer_id);
+        perror(perror_msg);
+        exit_code = 1;
+        goto exit;
+    }
+
     while (!should_terminate) {
         printf("Printer %d: Waiting for job\n", printer_id);
-        if (semset_wait(printer_mutex, printer_id) == -1) {
+        if (semset_wait(printer_busy, printer_id) == -1) {
             if (errno == EINTR && should_terminate) {
                 break;
             }
@@ -378,7 +414,7 @@ int printer(const int printer_id) {
         }
 
         printf("Printer %d: Finished printing\n", printer_id);
-        if (semset_signal(printer_mutex, printer_id) == -1) {
+        if (semset_signal(printer_ready, printer_id) == -1) {
             char perror_msg[128];
             snprintf(perror_msg, sizeof(perror_msg), "Printer %d: Could not signal readiness", printer_id);
             perror(perror_msg);
@@ -482,13 +518,13 @@ int print(const struct PrintJob print_job) {
     printf("print() for application %d: Initialized\n", pid);
 
     // Main function
-    printf("print() for application %d: Waiting for space in pending jobs queue\n", pid);
+    printf("print() for application %d: Waiting for free slot in pending jobs queue\n", pid);
     if (sem_wait(pending_jobs_free) == -1) {
         char perror_msg[128];
         snprintf(
             perror_msg,
             sizeof(perror_msg),
-            "print() for application %d: Could not wait for space in pending jobs queue",
+            "print() for application %d: Could not wait for free slot in pending jobs queue",
             pid);
         perror(perror_msg);
         exit_code = -1;
@@ -558,24 +594,24 @@ exit:
     return exit_code;
 }
 
-int application() {
+int application(int application_id) {
     const pid_t pid = getpid();
-    printf("Application %d: Started\n", pid);
+    printf("Application %d: Started with PID %d\n", application_id, pid);
 
     struct PrintJob print_job;
     print_job.pageCount = rand_range(2, 6);
     print_job.data = rand();
 
-    printf("Application %d: Printing job with %d pages and data of %d\n", pid, print_job.pageCount, print_job.data);
+    printf("Application %d: Printing job with %d pages and data of %d\n", application_id, print_job.pageCount, print_job.data);
 
     if (print(print_job) == -1) {
-        printf("Application %d: Error while printing\n", pid);
-        printf("Application %d: Exiting with code 1\n", pid);
+        printf("Application %d: Error while printing\n", application_id);
+        printf("Application %d: Exiting with code 1 (PID was %d)\n", application_id, pid);
         return 1;
     }
 
-    printf("Application %d: Finished printing\n", pid);
-    printf("Application %d: Exiting with code 0\n", pid);
+    printf("Application %d: Finished printing\n", application_id);
+    printf("Application %d: Exiting with code 0 (PID was %d)\n", application_id, pid);
     return 0;
 }
 
@@ -642,7 +678,7 @@ int main(void) {
             return 1;
         }
         if (application_pid == 0) {
-            return application();
+            return application(application_id);
         }
 
         printf("Main: Started application %d out of %d with PID %d\n", application_id, APPLICATION_COUNT, application_pid);
@@ -652,8 +688,11 @@ int main(void) {
         int status;
         const pid_t pid = wait(&status);
         if (pid == -1) {
+            if (errno == ECHILD) {
+                break;
+            }
+
             perror("Main: Could not wait for child process to exit");
-            break;
         }
 
         if (WIFEXITED(status)) {
