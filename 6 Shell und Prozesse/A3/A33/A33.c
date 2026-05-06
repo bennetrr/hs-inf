@@ -686,7 +686,10 @@ int main(void) {
 
     for (int i = 0; i < TOTAL_CHILD_PROCESS_COUNT; i++) {
         int status;
-        const pid_t pid = wait(&status);
+        pid_t pid;
+
+        while ((pid = wait(&status)) == -1 && errno == EINTR); // Retry if wait was interrupted by signal
+
         if (pid == -1) {
             if (errno == ECHILD) {
                 break;
