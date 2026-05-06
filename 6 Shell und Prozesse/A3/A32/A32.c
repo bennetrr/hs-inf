@@ -2,9 +2,9 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#include "../helpers.c"
+#include "../shm_helpers.c"
 
-static constexpr int SHARED_MEMORY_KEY = 424242424;
+static constexpr int PENDING_JOBS_SHM_KEY = 424242424;
 
 int child_process(const int shared_memory_handle, const int iterations) {
     const int* shared_memory = shm_attach(shared_memory_handle);
@@ -26,7 +26,7 @@ int main(const int argc, const char *argv[]) {
     const int seed = atoi(argv[2]);
     srand(seed);
 
-    const int shared_memory_handle = shm_create(SHARED_MEMORY_KEY, sizeof(int));
+    const int shared_memory_handle = shm_create(PENDING_JOBS_SHM_KEY, sizeof(int));
     if (shared_memory_handle == -1) {
         perror("Could not create shared memory");
         return 1;
@@ -35,6 +35,7 @@ int main(const int argc, const char *argv[]) {
     const pid_t child_pid = fork();
     if (child_pid == -1) {
         perror("Could not fork process");
+        shm_delete(shared_memory_handle);
         return 1;
     }
     if (child_pid == 0) {
@@ -48,5 +49,6 @@ int main(const int argc, const char *argv[]) {
         printf("Schreiber %d: %d\n", i, *shared_memory);
     }
 
+    shm_delete(shared_memory_handle);
     return 0;
 }
