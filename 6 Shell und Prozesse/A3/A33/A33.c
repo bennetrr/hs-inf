@@ -1,3 +1,4 @@
+#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -9,6 +10,7 @@ static constexpr int MINUTE = 60;
 static constexpr int APPLICATION_COUNT = 5;
 static constexpr size_t QUEUE_SIZE = 5;
 static constexpr int PRINTER_COUNT = 2;
+static constexpr int TOTAL_CHILD_PROCESS_COUNT = APPLICATION_COUNT + PRINTER_COUNT + 1;
 
 static constexpr int PENDING_JOBS_SHM_KEY = 424242424;
 static constexpr int PRINTING_JOBS_SHM_KEY = 434343434;
@@ -16,6 +18,21 @@ static constexpr int PENDING_JOBS_MUTEX_SEM_KEY = 444444444;
 static constexpr int PENDING_JOBS_FREE_SEM_KEY = 454545454;
 static constexpr int PENDING_JOBS_WAITING_SEM_KEY = 464646464;
 static constexpr int PRINTER_MUTEX_SEM_KEY = 474747474;
+
+static volatile bool should_terminate = false;
+
+void loop_signal_handler(const int signal) {
+    printf("Child process %d: Received signal %d\n", getpid(), signal);
+    should_terminate = true;
+}
+
+void main_signal_handler(const int signal) {
+    printf("Main: Received signal %d", signal);
+
+    if (kill(0, SIGTERM) == -1) { // This sends SIGTERM to all child processes
+        perror("Main: Could not terminate child processes");
+    }
+}
 
 int rand_range(const int min, const int max) {
     return min + rand() % (max - min + 1);
@@ -79,6 +96,21 @@ int spooler() {
     int pending_jobs_waiting = -1;
     int printer_mutex = -1;
     int current_printer_id = 0;
+
+    struct sigaction sa;
+    sa.sa_handler = loop_signal_handler;
+    sigemptyset(&sa.sa_mask);
+    sa.sa_flags = 0;
+    if (sigaction(SIGINT, &sa, nullptr) == -1) {
+        perror("Spooler: Could not install SIGINT handler");
+        exit_code = 1;
+        goto exit;
+    }
+    if (sigaction(SIGTERM, &sa, nullptr) == -1) {
+        perror("Spooler: Could not install SIGTERM handler");
+        exit_code = 1;
+        goto exit;
+    }
 
     pending_jobs_shm_handle = shm_create(PENDING_JOBS_SHM_KEY, sizeof(struct Queue));
     if (pending_jobs_shm_handle == -1) {
@@ -160,7 +192,7 @@ int spooler() {
     printf("Spooler: Initialized\n");
 
     // Main loop
-    while (true) {
+    while (!should_terminate) {
         printf("Spooler: Waiting for pending print jobs\n");
         sem_wait(pending_jobs_waiting);
 
@@ -186,6 +218,10 @@ int spooler() {
     // Cleanup
 exit:
     printf("Spooler: Cleaning up resources\n");
+
+    if (killpg(getppid(), SIGTERM) == -1) {
+        perror("Spooler: Could not terminate sibling processes");
+    }
 
     if (pending_jobs != nullptr && shm_detach(pending_jobs) == -1) {
         perror("Spooler: Could not detach shared memory");
@@ -229,6 +265,25 @@ int printer(const int printer_id) {
     int exit_code = 0;
     struct PrintJob *printing_jobs = nullptr;
 
+    struct sigaction sa;
+    sa.sa_handler = loop_signal_handler;
+    sigemptyset(&sa.sa_mask);
+    sa.sa_flags = 0;
+    if (sigaction(SIGINT, &sa, nullptr) == -1) {
+        char perror_msg[128];
+        snprintf(perror_msg, sizeof(perror_msg), "Printer %d: Could not install SIGINT handler", printer_id);
+        perror(perror_msg);
+        exit_code = 1;
+        goto exit;
+    }
+    if (sigaction(SIGTERM, &sa, nullptr) == -1) {
+        char perror_msg[128];
+        snprintf(perror_msg, sizeof(perror_msg), "Printer %d: Could not install SIGTERM handler", printer_id);
+        perror(perror_msg);
+        exit_code = 1;
+        goto exit;
+    }
+
     const int printing_jobs_shm_handle = shm_get_handle(PRINTING_JOBS_SHM_KEY);
     if (printing_jobs_shm_handle == -1) {
         char perror_msg[128];
@@ -259,7 +314,7 @@ int printer(const int printer_id) {
     printf("Printer %d: Initialized\n", printer_id);
 
     // Main loop
-    while (true) {
+    while (!should_terminate) {
         printf("Printer %d: Waiting for job\n", printer_id);
         semset_wait(printer_mutex, printer_id);
         const struct PrintJob print_job = printing_jobs[printer_id];
@@ -404,38 +459,39 @@ int main(void) {
     if (spooler_pid == 0) {
         return spooler();
     }
-    printf("Main: Started spooler %d\n", spooler_pid);
+    printf("Main: Started spooler with PID %d\n", spooler_pid);
 
     for (int printer_id = 0; printer_id < PRINTER_COUNT; printer_id++) {
         const pid_t printer_pid = fork();
         if (printer_pid == -1) {
-            perror("Main: Could not fork");
+            perror("Main: Could not fork printer process");
             return -1;
         }
         if (printer_pid == 0) {
             return printer(printer_id);
         }
+
+        printf("Main: Started printer %d out of %d with PID %d\n", printer_id, PRINTER_COUNT, spooler_pid);
     }
 
     for (int application_id = 0; application_id < APPLICATION_COUNT; application_id++) {
-        const int delay = rand_range(0, 4) * MINUTE;
+        const int delay = rand_range(0, 4);
         printf("Main: Waiting %d minutes before starting application %d\n", delay, application_id);
-        sleep(delay);
+        sleep(delay * MINUTE);
 
         const pid_t application_pid = fork();
         if (application_pid == -1) {
-            perror("Main: Could not fork");
+            perror("Main: Could not fork application process");
             return -1;
         }
         if (application_pid == 0) {
             return application();
         }
 
-        printf("Main: Started application %d\n", application_id);
+        printf("Main: Started application %d out of %d with PID %d\n", application_id, APPLICATION_COUNT, spooler_pid);
     }
 
-    // TODO: Improve exit logic (spooler exits, terminate all other processes)
-    for (int i = 0; i < 1 + PRINTER_COUNT + APPLICATION_COUNT; i++) {
+    for (int i = 0; i < TOTAL_CHILD_PROCESS_COUNT; i++) {
         int status;
         const pid_t pid = wait(&status);
         if (pid == -1) {
