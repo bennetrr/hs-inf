@@ -1,3 +1,4 @@
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -16,13 +17,13 @@ void get_input(char **buffer) {
 }
 
 int main(void) {
-	struct Item *head = nullptr;
-	struct Item *tail = nullptr;
+	struct Item *head = NULL;
+	struct Item *tail = NULL;
 
 	printf("Usage: Write '<NAME>\\n<SURNAME>\\n' or 'exit'\n");
 
 	while (true) {
-		char *name = nullptr;
+		char *name = NULL;
 		get_input(&name);
 
 		if (strcmp(name, "exit") == 0) {
@@ -30,7 +31,7 @@ int main(void) {
 			break;
 		}
 
-		char *surname = nullptr;
+		char *surname = NULL;
 		get_input(&surname);
 
 		if (strcmp(surname, "exit") == 0) {
@@ -45,15 +46,15 @@ int main(void) {
 
 			head->name = name;
 			head->surname = surname;
-			head->next = nullptr;
-			head->prev = nullptr;
+			head->next = NULL;
+			head->prev = NULL;
 		} else {
 			struct Item *oldTail = tail;
 			tail = (struct Item *) malloc(sizeof(struct Item));
 
 			tail->name = name;
 			tail->surname = surname;
-			tail->next = nullptr;
+			tail->next = NULL;
 			tail->prev = oldTail;
 			oldTail->next = tail;
 		}

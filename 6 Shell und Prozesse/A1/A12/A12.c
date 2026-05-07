@@ -14,7 +14,7 @@ int main(const int argc, const char *argv[]) {
 	for (int i = 0; i < nameCount; i++) {
 		printf("%d: ", i);
 		size_t len = 0;
-		names[i] = nullptr;
+		names[i] = NULL;
 		getline(&names[i], &len, stdin);
 		names[i][strcspn(names[i], "\n")] = '\0';
 	}

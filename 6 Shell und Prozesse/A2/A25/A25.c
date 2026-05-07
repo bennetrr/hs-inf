@@ -1,4 +1,5 @@
 #include <limits.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -17,7 +18,7 @@ bool str_starts_with(const char *str, const char *prefix) {
 }
 
 size_t str_count_char(const char *str, const char c) {
-    if (str == nullptr) {
+    if (str == NULL) {
         return 0;
     }
 
@@ -32,7 +33,7 @@ size_t str_count_char(const char *str, const char c) {
 }
 
 bool str_is_empty_or_whitespace(const char *str) {
-    return str == nullptr || str[0] == '\0' || strspn(str, " \t\n") == strlen(str);
+    return str == NULL || str[0] == '\0' || strspn(str, " \t\n") == strlen(str);
 }
 
 // Splits the commandline input
@@ -40,17 +41,17 @@ size_t split_cmdline(char **argv, const size_t estimated_argc, char *cmdline) {
     char *token = strtok(cmdline, " ");
     size_t argc = 0;
 
-    while (token != nullptr) {
+    while (token != NULL) {
         // This should not happen, but just in case
         if (argc >= estimated_argc - 1) {
             break;
         }
 
         argv[argc++] = token;
-        token = strtok(nullptr, " ");
+        token = strtok(NULL, " ");
     }
 
-    argv[argc] = nullptr;
+    argv[argc] = NULL;
     return argc;
 }
 
@@ -90,7 +91,7 @@ bool get_absolute_path_of_executable(char *executable_path, const char *argv0) {
     // - Path starting with home directory (~/)
     if (str_starts_with(argv0, "~/")) {
         const char *home = getenv("HOME");
-        if (home == nullptr) {
+        if (home == NULL) {
             fprintf(stderr, "HOME environment variable not set\n");
             return false;
         }
@@ -108,7 +109,7 @@ bool get_absolute_path_of_executable(char *executable_path, const char *argv0) {
 
     // For all other commands: Search in PATH
     const char *path_ro = getenv("PATH");
-    if (path_ro == nullptr) {
+    if (path_ro == NULL) {
         fprintf(stderr, "PATH environment variable not set\n");
         return false;
     }
@@ -118,7 +119,7 @@ bool get_absolute_path_of_executable(char *executable_path, const char *argv0) {
     strlcpy(path, path_ro, sizeof(path));
 
     char *token = strtok(path, ":");
-    while (token != nullptr) {
+    while (token != NULL) {
         char candidate_path[PATH_MAX];
         snprintf(candidate_path, PATH_MAX, "%s/%s", token, argv0);
 
@@ -127,7 +128,7 @@ bool get_absolute_path_of_executable(char *executable_path, const char *argv0) {
             return true;
         }
 
-        token = strtok(nullptr, ":");
+        token = strtok(NULL, ":");
     }
 
     return false;
@@ -197,7 +198,7 @@ int main(void) {
     while (true) {
         // PATH_MAX is the maximum number of chars a path can have
         char cwd[PATH_MAX]; // This way cwd does not need to be freed manually (thanks Nico!)
-        if (getcwd(cwd, PATH_MAX) == nullptr) {
+        if (getcwd(cwd, PATH_MAX) == NULL) {
             perror("Could not get current working directory");
             return 1;
         }
@@ -205,7 +206,7 @@ int main(void) {
         // Fancy color codes: https://stackoverflow.com/a/33206814
         fprintf(stderr, "\033[94m%s\033[0m \033[32m> \033[0m", cwd);
 
-        char *cmdline = nullptr;
+        char *cmdline = NULL;
         if (get_input(&cmdline) == -1) {
             free(cmdline);
 

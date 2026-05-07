@@ -4,8 +4,8 @@
 
 #include "../sem_helpers.c"
 
-static constexpr int SEM_NOTIFY_CHILD = 0;
-static constexpr int SEM_NOTIFY_PARENT = 1;
+#define SEM_NOTIFY_CHILD 0
+#define SEM_NOTIFY_PARENT 1
 
 int child_process(const int sem_handle) {
     printf("Child:  Waiting for notification from parent\n");
@@ -65,7 +65,7 @@ int main(void) {
     printf("Parent: Notification from child received\n");
 
     printf("Parent: Waiting for child to exit\n");
-    if (wait(nullptr) == -1) {
+    if (wait(NULL) == -1) {
         perror("Parent: Could not wait for child to exit");
         return 1;
     }

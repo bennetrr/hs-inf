@@ -1,3 +1,4 @@
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -17,8 +18,8 @@ size_t get_input(char **buffer, FILE *fp) {
 }
 
 int main(void) {
-	struct Item *head = nullptr;
-	struct Item *tail = nullptr;
+	struct Item *head = NULL;
+	struct Item *tail = NULL;
 
 	FILE *rfile = fopen("quelle", "r");
 	if (!rfile) {
@@ -27,12 +28,12 @@ int main(void) {
 	}
 
 	while (true) {
-		char *name = nullptr;
+		char *name = NULL;
 		if (get_input(&name, rfile) == -1) {
 			break;
 		}
 
-		char *surname = nullptr;
+		char *surname = NULL;
 		if (get_input(&surname, rfile) == -1) {
 			free(surname);
 			break;
@@ -44,15 +45,15 @@ int main(void) {
 
 			head->name = name;
 			head->surname = surname;
-			head->next = nullptr;
-			head->prev = nullptr;
+			head->next = NULL;
+			head->prev = NULL;
 		} else {
 			struct Item *oldTail = tail;
 			tail = (struct Item *) malloc(sizeof(struct Item));
 
 			tail->name = name;
 			tail->surname = surname;
-			tail->next = nullptr;
+			tail->next = NULL;
 			tail->prev = oldTail;
 			oldTail->next = tail;
 		}

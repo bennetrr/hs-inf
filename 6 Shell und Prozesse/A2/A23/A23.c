@@ -1,4 +1,5 @@
 #include <signal.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -21,12 +22,12 @@ int main(void) {
     sigemptyset(&sa.sa_mask);
     sa.sa_flags = 0;
 
-    if (sigaction(SIGTERM, &sa, nullptr) == -1) {
+    if (sigaction(SIGTERM, &sa, NULL) == -1) {
         perror("sigaction failed");
         return 1;
     }
 
-    if (sigaction(SIGINT, &sa, nullptr) == -1) {
+    if (sigaction(SIGINT, &sa, NULL) == -1) {
         perror("sigaction failed");
         return 1;
     }

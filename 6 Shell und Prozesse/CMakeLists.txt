@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 4.2)
 project(Scripts C)
 
-set(CMAKE_C_STANDARD 23)
+set(CMAKE_C_STANDARD 17)
 
 add_executable(A11 A1/A11/A11.c)
 add_executable(A12 A1/A12/A12.c)

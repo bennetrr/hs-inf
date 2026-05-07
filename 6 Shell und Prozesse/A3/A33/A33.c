@@ -1,5 +1,6 @@
 #include <errno.h>
 #include <signal.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -7,19 +8,19 @@
 #include "../sem_helpers.c"
 #include "../shm_helpers.c"
 
-static constexpr int MINUTE = 1;
-static constexpr int APPLICATION_COUNT = 5;
-static constexpr size_t QUEUE_SIZE = 5;
-static constexpr int PRINTER_COUNT = 2;
-static constexpr int TOTAL_CHILD_PROCESS_COUNT = APPLICATION_COUNT + PRINTER_COUNT + 1;
+#define MINUTE 1
+#define APPLICATION_COUNT 5
+#define QUEUE_SIZE 5
+#define PRINTER_COUNT 2
+#define TOTAL_CHILD_PROCESS_COUNT (APPLICATION_COUNT + PRINTER_COUNT + 1)
 
-static constexpr int SHARED_MEMORY_KEY = 0x19496CF8; // This is 424242424 in hex because ipcs displays keys in hex
-static constexpr int PRINTING_JOBS_SHM_KEY = 0x19E38E0A;
-static constexpr int PENDING_JOBS_MUTEX_SEM_KEY = 0x1A7DAF1C;
-static constexpr int PENDING_JOBS_FREE_SEM_KEY = 0x1B17D02E;
-static constexpr int PENDING_JOBS_WAITING_SEM_KEY = 0x1BB1F140;
-static constexpr int PRINTER_READY_SEM_KEY = 0x1C4C1252;
-static constexpr int PRINTER_BUSY_SEM_KEY = 0x1CE63364;
+#define SHARED_MEMORY_KEY 0x19496CF8 // This is 424242424 in hex because ipcs displays keys in hex
+#define PRINTING_JOBS_SHM_KEY 0x19E38E0A
+#define PENDING_JOBS_MUTEX_SEM_KEY 0x1A7DAF1C
+#define PENDING_JOBS_FREE_SEM_KEY 0x1B17D02E
+#define PENDING_JOBS_WAITING_SEM_KEY 0x1BB1F140
+#define PRINTER_READY_SEM_KEY 0x1C4C1252
+#define PRINTER_BUSY_SEM_KEY 0x1CE63364
 
 static bool should_terminate = false;
 
@@ -86,9 +87,9 @@ int spooler() {
 
     int exit_code = 0;
     int pending_jobs_shm_handle = -1;
-    struct Queue *pending_jobs = nullptr;
+    struct Queue *pending_jobs = NULL;
     int printing_jobs_shm_handle = -1;
-    struct PrintJob *printing_jobs = nullptr;
+    struct PrintJob *printing_jobs = NULL;
     int pending_jobs_mutex = -1;
     int pending_jobs_free = -1;
     int pending_jobs_waiting = -1;
@@ -100,12 +101,12 @@ int spooler() {
     sa.sa_handler = loop_signal_handler;
     sigemptyset(&sa.sa_mask);
     sa.sa_flags = 0;
-    if (sigaction(SIGINT, &sa, nullptr) == -1) {
+    if (sigaction(SIGINT, &sa, NULL) == -1) {
         perror("Spooler: Could not install SIGINT handler");
         exit_code = 1;
         goto exit;
     }
-    if (sigaction(SIGTERM, &sa, nullptr) == -1) {
+    if (sigaction(SIGTERM, &sa, NULL) == -1) {
         perror("Spooler: Could not install SIGTERM handler");
         exit_code = 1;
         goto exit;
@@ -121,7 +122,7 @@ int spooler() {
     if ((intptr_t) pending_jobs == -1) {
         perror("Spooler: Could not attach pending jobs queue shared memory");
         exit_code = 1;
-        pending_jobs = nullptr;
+        pending_jobs = NULL;
         goto exit;
     }
     queue_init(pending_jobs);
@@ -136,7 +137,7 @@ int spooler() {
     if ((intptr_t) printing_jobs == -1) {
         perror("Spooler: Could not attach printing jobs shared memory");
         exit_code = 1;
-        printing_jobs = nullptr;
+        printing_jobs = NULL;
         goto exit;
     }
 
@@ -273,14 +274,14 @@ int spooler() {
 exit:
     printf("Spooler: Cleaning up resources\n");
 
-    if (pending_jobs != nullptr && shm_detach(pending_jobs) == -1) {
+    if (pending_jobs != NULL && shm_detach(pending_jobs) == -1) {
         perror("Spooler: Could not detach pending jobs queue shared memory");
     }
     if (pending_jobs_shm_handle != -1 && shm_delete(pending_jobs_shm_handle) == -1) {
         perror("Spooler: Could not delete pending jobs queue shared memory");
     }
 
-    if (printing_jobs != nullptr && shm_detach(printing_jobs) == -1) {
+    if (printing_jobs != NULL && shm_detach(printing_jobs) == -1) {
         perror("Spooler: Could not detach printing jobs shared memory");
     }
     if (printing_jobs_shm_handle != -1 && shm_delete(printing_jobs_shm_handle) == -1) {
@@ -317,20 +318,20 @@ int printer(const int printer_id) {
     printf("Printer %d: Initializing\n", printer_id);
 
     int exit_code = 0;
-    struct PrintJob *printing_jobs = nullptr;
+    struct PrintJob *printing_jobs = NULL;
 
     struct sigaction sa;
     sa.sa_handler = loop_signal_handler;
     sigemptyset(&sa.sa_mask);
     sa.sa_flags = 0;
-    if (sigaction(SIGINT, &sa, nullptr) == -1) {
+    if (sigaction(SIGINT, &sa, NULL) == -1) {
         char perror_msg[128];
         snprintf(perror_msg, sizeof(perror_msg), "Printer %d: Could not install SIGINT handler", printer_id);
         perror(perror_msg);
         exit_code = 1;
         goto exit;
     }
-    if (sigaction(SIGTERM, &sa, nullptr) == -1) {
+    if (sigaction(SIGTERM, &sa, NULL) == -1) {
         char perror_msg[128];
         snprintf(perror_msg, sizeof(perror_msg), "Printer %d: Could not install SIGTERM handler", printer_id);
         perror(perror_msg);
@@ -356,7 +357,7 @@ int printer(const int printer_id) {
             printer_id);
         perror(perror_msg);
         exit_code = 1;
-        printing_jobs = nullptr;
+        printing_jobs = NULL;
         goto exit;
     }
 
@@ -428,7 +429,7 @@ int printer(const int printer_id) {
 exit:
     printf("Printer %d: Cleaning up resources\n", printer_id);
 
-    if (printing_jobs != nullptr && shm_detach(printing_jobs) == -1) {
+    if (printing_jobs != NULL && shm_detach(printing_jobs) == -1) {
         char perror_msg[128];
         snprintf(
             perror_msg,
@@ -449,7 +450,7 @@ int print(const struct PrintJob print_job) {
     printf("print() for application %d: Initializing\n", pid);
 
     int exit_code = 0;
-    struct Queue *pending_jobs = nullptr;
+    struct Queue *pending_jobs = NULL;
 
     const int pending_jobs_shm_handle = shm_get_handle(SHARED_MEMORY_KEY);
     if (pending_jobs_shm_handle == -1) {
@@ -473,7 +474,7 @@ int print(const struct PrintJob print_job) {
             pid);
         perror(perror_msg);
         exit_code = -1;
-        pending_jobs = nullptr;
+        pending_jobs = NULL;
         goto exit;
     }
 
@@ -581,7 +582,7 @@ int print(const struct PrintJob print_job) {
 exit:
     printf("print() for application %d: Cleaning up resources\n", pid);
 
-    if (pending_jobs != nullptr && shm_detach(pending_jobs) == -1) {
+    if (pending_jobs != NULL && shm_detach(pending_jobs) == -1) {
         char perror_msg[128];
         snprintf(
             perror_msg,
@@ -627,11 +628,11 @@ int main(void) {
     sa.sa_handler = main_signal_handler;
     sigemptyset(&sa.sa_mask);
     sa.sa_flags = 0;
-    if (sigaction(SIGINT, &sa, nullptr) == -1) {
+    if (sigaction(SIGINT, &sa, NULL) == -1) {
         perror("Main: Could not install SIGINT handler");
         return 1;
     }
-    if (sigaction(SIGTERM, &sa, nullptr) == -1) {
+    if (sigaction(SIGTERM, &sa, NULL) == -1) {
         perror("Main: Could not install SIGTERM handler");
         return 1;
     }

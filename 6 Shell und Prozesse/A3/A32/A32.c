@@ -4,7 +4,7 @@
 
 #include "../shm_helpers.c"
 
-static constexpr int SHARED_MEMORY_KEY = 0x18AF4BE6;
+#define SHARED_MEMORY_KEY 0x18AF4BE6
 
 int child_process(const int shared_memory_handle, const int iterations) {
     const int *shared_memory = shm_attach(shared_memory_handle);
