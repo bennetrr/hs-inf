@@ -7,16 +7,12 @@ int semset_create(const int key, const int n) {
 
 // Sets the value of the semaphore associated with the handle and index. Returns 0 on success and -1 on failure
 int semset_set(const int handle, const int n, const int value) {
-    union semun opts;
-    opts.val = value;
-    return semctl(handle, n, SETVAL, opts);
+    return semctl(handle, n, SETVAL, value);
 }
 
 // Sets the values of all n semaphores associated with the handle. Returns 0 on success and -1 on failure
-int semset_set_all(const int handle, unsigned short values[]) {
-    union semun opts;
-    opts.array = values;
-    return semctl(handle, 0, SETALL, opts);
+int semset_set_all(const int handle, const unsigned short values[]) {
+    return semctl(handle, 0, SETALL, values);
 }
 
 // Waits for the specified semaphore. Returns 0 on success and -1 on failure

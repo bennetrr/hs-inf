@@ -596,7 +596,7 @@ exit:
     return exit_code;
 }
 
-int application(int application_id) {
+int application(const int application_id) {
     const pid_t pid = getpid();
     printf("Application %d: Started with PID %d\n", application_id, pid);
 
