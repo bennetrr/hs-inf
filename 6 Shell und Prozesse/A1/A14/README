@@ -1,0 +1,7 @@
+Author: bennetrr
+Shell und Prozesse SoSe 2026
+Sheet 1, exercise 14
+
+Compile: gcc -o A14.out A14.c
+Run: ./A14.out
+Usage: Write as many pairs of names and surnames as you like, separated by newlines, into a file named "quelle"

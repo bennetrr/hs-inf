@@ -1,0 +1,7 @@
+Author: bennetrr
+Shell und Prozesse SoSe 2026
+Sheet 2, exercise 24
+
+Compile: gcc -o A24.out A24.c && gcc -o A24-child-a.out A24-child-a.c && gcc -o A24-child-c.out A24-child-c.c
+Run: ./A24.out
+Usage: Depending on the sub-exercise, replace the path in A24.c:13

@@ -1,0 +1,7 @@
+Author: bennetrr
+Shell und Prozesse SoSe 2026
+Sheet 1, exercise 13
+
+Compile: gcc -o A13.out A13.c
+Run: ./A13.out
+Usage: Enter as many pairs of names and surnames as you like, separated by newlines

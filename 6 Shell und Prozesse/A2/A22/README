@@ -1,0 +1,6 @@
+Author: bennetrr
+Shell und Prozesse SoSe 2026
+Sheet 2, exercise 22
+
+Compile: gcc -o A22.out A22.c
+Run: ./A22.out <ARG1> <ARG2> <ARG3> <ARG4>

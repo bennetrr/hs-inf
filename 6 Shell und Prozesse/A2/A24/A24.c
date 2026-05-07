@@ -10,7 +10,7 @@ int main(const int argc, char *argv[]) {
     }
 
     if (child_pid == 0) {
-        execv("./A24.child.out", argv);
+        execv("./A24-child-a.out", argv);
         perror("execv failed");
         return 1;
     }

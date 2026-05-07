@@ -7,13 +7,13 @@
 #include "../sem_helpers.c"
 #include "../shm_helpers.c"
 
-static constexpr int MINUTE = 60;
+static constexpr int MINUTE = 1;
 static constexpr int APPLICATION_COUNT = 5;
 static constexpr size_t QUEUE_SIZE = 5;
 static constexpr int PRINTER_COUNT = 2;
 static constexpr int TOTAL_CHILD_PROCESS_COUNT = APPLICATION_COUNT + PRINTER_COUNT + 1;
 
-static constexpr int PENDING_JOBS_SHM_KEY = 0x19496CF8; // This is 424242424 in hex because ipcs displays keys in hex
+static constexpr int SHARED_MEMORY_KEY = 0x19496CF8; // This is 424242424 in hex because ipcs displays keys in hex
 static constexpr int PRINTING_JOBS_SHM_KEY = 0x19E38E0A;
 static constexpr int PENDING_JOBS_MUTEX_SEM_KEY = 0x1A7DAF1C;
 static constexpr int PENDING_JOBS_FREE_SEM_KEY = 0x1B17D02E;
@@ -111,7 +111,7 @@ int spooler() {
         goto exit;
     }
 
-    pending_jobs_shm_handle = shm_create(PENDING_JOBS_SHM_KEY, sizeof(struct Queue));
+    pending_jobs_shm_handle = shm_create(SHARED_MEMORY_KEY, sizeof(struct Queue));
     if (pending_jobs_shm_handle == -1) {
         perror("Spooler: Could not create pending jobs queue shared memory");
         exit_code = 1;
@@ -206,8 +206,8 @@ int spooler() {
     while (!should_terminate) {
         printf("Spooler: Waiting for pending print jobs\n");
         if (sem_wait(pending_jobs_waiting) == -1) {
+            // EINTR means the wait operation was interrupted by a signal
             if (errno == EINTR && should_terminate) {
-                // EINTR means the wait operation was interrupted by a signal
                 break;
             }
             perror("Spooler: Could not wait for pending print jobs");
@@ -409,6 +409,7 @@ int printer(const int printer_id) {
             printf("Printer %d: Printing page %d (data: %d)\n", printer_id, page, print_job.data);
 
             if (sleep(1 * MINUTE) != 0 && should_terminate) {
+                printf("Printer %d: Could not sleep\n", printer_id);
                 break;
             }
         }
@@ -450,7 +451,7 @@ int print(const struct PrintJob print_job) {
     int exit_code = 0;
     struct Queue *pending_jobs = nullptr;
 
-    const int pending_jobs_shm_handle = shm_get_handle(PENDING_JOBS_SHM_KEY);
+    const int pending_jobs_shm_handle = shm_get_handle(SHARED_MEMORY_KEY);
     if (pending_jobs_shm_handle == -1) {
         char perror_msg[128];
         snprintf(
@@ -620,7 +621,6 @@ int application(int application_id) {
 }
 
 int main(void) {
-    setvbuf(stdout, nullptr, _IONBF, 0); // Disable buffering so printf lines stay in order
     printf("Main: Started with PID %d\n", getpid());
 
     struct sigaction sa;
@@ -703,7 +703,8 @@ int main(void) {
         int status;
         pid_t pid;
 
-        while ((pid = wait(&status)) == -1 && errno == EINTR); // Retry if wait was interrupted by signal
+        // Retry if wait was interrupted by signal
+        while ((pid = wait(&status)) == -1 && errno == EINTR) {}
 
         if (pid == -1) {
             if (errno == ECHILD) {

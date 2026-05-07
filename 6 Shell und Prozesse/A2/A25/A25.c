@@ -167,7 +167,7 @@ int process_cmdline(char *cmdline) {
     char *argv[estimated_argc];
     const size_t argc = split_cmdline(argv, estimated_argc, cmdline);
 
-    if (strcmp(argv[0], "exit") == 0) {
+    if (strcmp(argv[0], "exit") == 0 || strcmp(argv[0], "schluss") == 0) {
         return 0; // exit remains here because otherwise execute_builtin would need to return whether to exit the shell
     }
 

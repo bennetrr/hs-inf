@@ -1,0 +1,7 @@
+Author: bennetrr
+Shell und Prozesse SoSe 2026
+Sheet 1, exercise 12
+
+Compile: gcc -o A12.out A12.c
+Run: ./A12.out <NAME_COUNT>
+Usage: Enter NAME_COUNT names, separated by newlines

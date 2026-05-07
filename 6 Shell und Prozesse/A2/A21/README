@@ -1,0 +1,6 @@
+Author: bennetrr
+Shell und Prozesse SoSe 2026
+Sheet 2, exercise 21
+
+Compile: gcc -o A21.out A21.c
+Run: ./A21.out
