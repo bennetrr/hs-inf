@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 #include <unistd.h>
 
 #include "../sem_helpers.c"
@@ -637,7 +638,7 @@ int main(void) {
         return 1;
     }
 
-    sranddev(); // Initializes the random number generator with a random seed
+    srand(time(NULL)); // Initializes the random number generator with a random seed
 
     printf("Main: Starting spooler\n");
     const pid_t spooler_pid = fork();
