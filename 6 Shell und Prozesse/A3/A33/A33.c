@@ -21,8 +21,9 @@
 #define PENDING_JOBS_MUTEX_SEM_KEY 0x1A7DAF1C
 #define PENDING_JOBS_FREE_SEM_KEY 0x1B17D02E
 #define PENDING_JOBS_WAITING_SEM_KEY 0x1BB1F140
-#define PRINTER_READY_SEM_KEY 0x1C4C1252
-#define PRINTER_BUSY_SEM_KEY 0x1CE63364
+#define PRINTER_MUTEX_SEM_KEY 0x1C4C1252
+#define PRINTER_READY_SEM_KEY 0x1CE63364
+#define PRINTER_BUSY_SEM_KEY 0x1D805476
 
 static bool should_terminate = false;
 
@@ -95,6 +96,7 @@ int spooler() {
     int pending_jobs_mutex = -1;
     int pending_jobs_free = -1;
     int pending_jobs_waiting = -1;
+    int printer_mutex = -1;
     int printer_ready = -1;
     int printer_busy = -1;
     int current_printer_id = 0;
@@ -179,6 +181,18 @@ int spooler() {
         goto exit;
     }
 
+    printer_mutex = semset_create(PRINTER_MUTEX_SEM_KEY, PRINTER_COUNT);
+    if (printer_mutex == -1) {
+        perror("Spooler: Could not create printer mutex semaphore");
+        exit_code = 1;
+        goto exit;
+    }
+    if (semset_set_all(printer_mutex, (unsigned short[]){1, 1}) == -1) {
+        perror("Spooler: Could not initialize printer mutex semaphore");
+        exit_code = 1;
+        goto exit;
+    }
+
     printer_ready = semset_create(PRINTER_READY_SEM_KEY, PRINTER_COUNT);
     if (printer_ready == -1) {
         perror("Spooler: Could not create printer ready semaphore");
@@ -243,21 +257,36 @@ int spooler() {
             exit_code = 2;
             break;
         }
-        printing_jobs[current_printer_id] = current_job;
         if (sem_signal(pending_jobs_mutex) == -1) {
             perror("Spooler: Could not release access to pending jobs queue");
             exit_code = 2;
             break;
         }
         printf(
-            "Spooler: Wrote print job to printer %d (data: %d, pages: %d)\n",
-            current_printer_id,
+            "Spooler: Got print job from queue (data: %d, pages: %d)\n",
             current_job.data,
             current_job.pageCount);
 
         printf("Spooler: Signaling free slot in pending job queue\n");
         if (sem_signal(pending_jobs_free) == -1) {
             perror("Spooler: Could not signal a free space in pending job queue");
+            exit_code = 2;
+            break;
+        }
+
+        printf("Spooler: Waiting for access to printer job memory\n");
+        if (semset_wait(printer_mutex, current_printer_id) == -1) {
+            if (errno == EINTR && should_terminate) {
+                break;
+            }
+            perror("Spooler: Could not wait for access to printer job memory");
+            exit_code = 2;
+            break;
+        }
+        printing_jobs[current_printer_id] = current_job;
+        printf("Spooler: Sent print job to printer %d\n", current_printer_id);
+        if (semset_signal(printer_mutex, current_printer_id) == -1) {
+            perror("Spooler: Could not release access to printer job memory");
             exit_code = 2;
             break;
         }
@@ -300,6 +329,10 @@ exit:
 
     if (pending_jobs_waiting != -1 && sem_delete(pending_jobs_waiting) == -1) {
         perror("Spooler: Could not delete pending jobs waiting semaphore");
+    }
+
+    if (printer_mutex != -1 && sem_delete(printer_mutex) == -1) {
+        perror("Spooler: Could not delete printer mutex semaphore");
     }
 
     if (printer_ready != -1 && sem_delete(printer_ready) == -1) {
@@ -363,6 +396,15 @@ int printer(const int printer_id) {
         goto exit;
     }
 
+    const int printer_mutex = sem_get_handle(PRINTER_MUTEX_SEM_KEY);
+    if (printer_mutex == -1) {
+        char perror_msg[128];
+        snprintf(perror_msg, sizeof(perror_msg), "Printer %d: Could not get printer mutex semaphore", printer_id);
+        perror(perror_msg);
+        exit_code = 1;
+        goto exit;
+    }
+
     const int printer_ready = sem_get_handle(PRINTER_READY_SEM_KEY);
     if (printer_ready == -1) {
         char perror_msg[128];
@@ -405,7 +447,26 @@ int printer(const int printer_id) {
             exit_code = 2;
             break;
         }
+
+        printf("Printer %d: Waiting for access to printer job memory\n", printer_id);
+        if (semset_wait(printer_mutex, printer_id) == -1) {
+            if (errno == EINTR && should_terminate) {
+                break;
+            }
+            char perror_msg[128];
+            snprintf(perror_msg, sizeof(perror_msg), "Printer %d: Could not wait for access to printer job memory", printer_id);
+            perror(perror_msg);
+            exit_code = 2;
+            break;
+        }
         const struct PrintJob print_job = printing_jobs[printer_id];
+        if (semset_signal(printer_mutex, printer_id) == -1) {
+            char perror_msg[128];
+            snprintf(perror_msg, sizeof(perror_msg), "Printer %d: Could not release access to printer job memory", printer_id);
+            perror(perror_msg);
+            exit_code = 2;
+            break;
+        }
 
         // Printing: 1 Minute / page
         for (int page = 0; page < print_job.pageCount; page++) {
@@ -734,5 +795,6 @@ int main(void) {
         }
     }
 
+    printf("Main: Exiting with code 0 (PID was %d)\n", getpid());
     return 0;
 }

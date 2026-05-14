@@ -1,0 +1,3 @@
+test message from file 1
+lorem ipsum
+123 test

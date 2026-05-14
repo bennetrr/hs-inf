@@ -1,0 +1,75 @@
+const size_t MAX_CHAR_COUNT = 7                             // Max number of chars the buffered reader accepts in one go
+const size_t MAX_LINE_COUNT = 3                             // Max number of lines the consumer accepts in one go
+
+shared_memory int lines_buffer[MAX_LINE_COUNT] = {-1, ...}  // Buffer for the handles of the shared memories for each line
+                                                            // When a slot is empty, it should be -1
+shared_memory char char_buffer[MAX_CHAR_COUNT]              // Buffer for chars from the producer for the buffered reader
+
+semaphore lines_buffer_mutex = 1                            // Mutex for lines_buffer
+semaphore lines_buffer_empty = MAX_LINE_COUNT               // Whether the buffered reader can write into lines_buffer
+semaphore lines_buffer_full = 0                             // Whether the consumer has lines to consume
+semaphore char_buffer_mutex = 1                             // Mutex for char_buffer
+semaphore char_buffer_empty = 1                             // Whether the producer can write into char_buffer
+semaphore char_buffer_full = 0                              // Whether the buffered reader has chars to read
+
+// In char_buffer, lines are terminated by 0x00. The whole message is terminated by 0x04 (end of transmission)
+// If the length of the source is divisible by MAX_CHAR_COUNT, an extra message is sent containing only 0x04
+
+// Producer process
+void producer(char[] chars) {
+    while (has_more_chars) {
+        char next_chars[MAX_CHAR_COUNT + 1] = take_chars_h(chars)
+
+        wait(char_buffer_empty)
+
+        wait(char_buffer_mutex)
+        char_buffer = next_chars
+        signal(char_buffer_mutex)
+
+        signal(char_buffer_full)
+    }
+}
+
+// Buffered reader process
+void buffered_reader() {
+    char line_buffer[]
+
+    while (has_more_chars) {
+        wait(char_buffer_full)
+
+        wait(char_buffer_mutex)
+        append_line_h(line_buffer, char_buffer)
+        signal(char_buffer_mutex)
+
+        signal(char_buffer_empty)
+
+        if (is_full_line) {
+            wait(lines_buffer_empty)
+
+            shared_memory char line_buffer_shm[strlen(line_buffer)]
+            line_buffer_shm = line_buffer
+
+            wait(lines_buffer_mutex)
+            append_line_buffer_h(lines_buffer, line_buffer_shm)
+            signal(lines_buffer_mutex)
+
+            signal(lines_buffer_full)
+        }
+    }
+}
+
+// Consumer process
+void consumer() {
+    while (has_more_lines) {
+        wait(lines_buffer_full)
+
+        wait(lines_buffer_mutex)
+        size_t line_length = get_line_length(lines_buffer)
+        char line[line_length] = get_line(lines_buffer)
+        signal(lines_buffer_mutex)
+
+        signal(lines_buffer_empty)
+
+        consume_line_h(line)
+    }
+}

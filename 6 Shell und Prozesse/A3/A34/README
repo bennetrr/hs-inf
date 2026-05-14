@@ -1,0 +1,6 @@
+Author: bennetrr
+Shell und Prozesse SoSe 2026
+Sheet 3, exercise 34
+
+Compile: gcc -o A34.out A34.c
+Run: ./A34.out

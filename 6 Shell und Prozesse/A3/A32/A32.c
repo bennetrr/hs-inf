@@ -4,8 +4,6 @@
 
 #include "../shm_helpers.c"
 
-#define SHARED_MEMORY_KEY 0x18AF4BE6
-
 int child_process(const int shared_memory_handle, const int iterations) {
     const int *shared_memory = shm_attach(shared_memory_handle);
     if ((intptr_t) shared_memory == -1) {
@@ -34,7 +32,7 @@ int main(const int argc, const char *argv[]) {
     const int seed = atoi(argv[2]);
     srand(seed);
 
-    const int shared_memory_handle = shm_create(SHARED_MEMORY_KEY, sizeof(int));
+    const int shared_memory_handle = shm_create(IPC_PRIVATE, sizeof(int));
     if (shared_memory_handle == -1) {
         perror("Writer: Could not create shared memory");
         return 1;
