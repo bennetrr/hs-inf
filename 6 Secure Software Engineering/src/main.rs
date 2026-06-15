@@ -13,7 +13,8 @@ async fn main() -> std::io::Result<()> {
     // Set up logging
 
     // Set up database connection
-    let db = Database::connect("sqlite:../db.sqlite?mode=rwc")
+    let db_uri = "sqlite:../db.sqlite?mode=rwc";
+    let db = Database::connect(db_uri)
         .await
         .expect("Failed to connect to the database");
 
