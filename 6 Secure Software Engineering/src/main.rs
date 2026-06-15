@@ -10,6 +10,9 @@ pub(crate) mod utils;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
+    // Set up logging
+
+    // Set up database connection
     let db = Database::connect("sqlite:../db.sqlite?mode=rwc")
         .await
         .expect("Failed to connect to the database");
