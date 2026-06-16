@@ -1,0 +1,47 @@
+services:
+  loki:
+    image: grafana/loki:3.6.7
+    restart: unless-stopped
+    command: -config.file=/etc/loki/local-config.yaml
+    volumes:
+      - ./loki/config.yaml:/etc/loki/local-config.yaml:ro
+      - loki-data:/loki
+    environment:
+      JAEGER_AGENT_HOST: alloy
+    networks:
+      default:
+
+  grafana:
+    image: grafana/grafana:12.4.1
+    restart: unless-stopped
+    ports:
+      - '65430:3000'
+    environment:
+      GF_SECURITY_ALLOW_EMBEDDING: true
+    volumes:
+      - ./grafana/datasources.yaml:/etc/grafana/provisioning/datasources/datasources.yaml:ro
+      - grafana-data:/var/lib/grafana
+    depends_on:
+      - loki
+    networks:
+      default:
+
+  alloy:
+    image: grafana/alloy:v1.14.0
+    restart: unless-stopped
+    ports:
+      - '65431:4318'
+    command: run /etc/alloy/config.alloy
+    volumes:
+      - ./alloy/config.alloy:/etc/alloy/config.alloy:ro
+    depends_on:
+      - loki
+    networks:
+      default:
+
+volumes:
+  loki-data:
+  grafana-data:
+
+networks:
+  default:
