@@ -15,9 +15,7 @@ opentelemetry-otlp = "0.32.0"
 opentelemetry_sdk = { version = "0.32.1", features = ["logs"] }
 rand_core = "0.10.1"
 serde = { version = "1.0.228", features = ["derive"] }
-tracing = "0.1.44"
-tracing-log = "0.2.0"
-tracing-subscriber = { version = "0.3.23", features = ["registry"] }
+tracing-subscriber = { version = "0.3.23", features = ["registry", "fmt", "env-filter"] }
 uuid = { version = "1.23.3", features = ["v4"] }
 
 [dependencies.sea-orm]
