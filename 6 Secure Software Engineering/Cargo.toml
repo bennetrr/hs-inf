@@ -11,6 +11,7 @@ flexi_logger = "0.31.9"
 jsonwebtoken = { version = "10.4.0", features = ["rust_crypto"] }
 log = { version = "0.4.32", features = ["kv", "kv_serde"] }
 opentelemetry-appender-tracing = "0.32.0"
+opentelemetry-otlp = "0.32.0"
 opentelemetry_sdk = { version = "0.32.1", features = ["logs"] }
 rand_core = "0.10.1"
 serde = { version = "1.0.228", features = ["derive"] }
