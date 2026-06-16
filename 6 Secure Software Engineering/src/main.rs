@@ -14,15 +14,20 @@ async fn main() -> std::io::Result<()> {
 
     // Set up database connection
     let db_uri = "sqlite:../db.sqlite?mode=rwc";
+    log::info!("Connecting to database on {db_uri}"); // Task 1.1
+    // log::info!(db_uri; "Connecting to database"); // Task 4.2
+
     let db = Database::connect(db_uri)
         .await
         .expect("Failed to connect to the database");
 
     // Migrate database schemas
+    log::info!("Migrating database schemas"); // Task 1.1 & 4.2
     db.get_schema_registry("craftmine-authentication-service::entities::*")
         .sync(&db)
         .await
         .expect("Failed to migrate the database");
+    log::info!("Database schema migration complete"); // Task 1.1 & 4.2
 
     let db_state = db.clone();
 
@@ -33,6 +38,8 @@ async fn main() -> std::io::Result<()> {
         .parse::<u16>()
         .unwrap_or(default_port);
 
+    log::info!("Starting HTTP server on port {port}"); // Task 1.1
+    // log::info!(port; "Starting HTTP server"); // Task 4.2
     HttpServer::new(move || {
         App::new()
             .app_data(web::Data::new(db_state.clone()))
@@ -53,6 +60,7 @@ async fn main() -> std::io::Result<()> {
     .await?;
 
     // Cleanup resources
+    log::info!("Shutting down, closing database connection"); // Task 1.1 & 4.2
     db.close()
         .await
         .expect("Failed to close database connection");

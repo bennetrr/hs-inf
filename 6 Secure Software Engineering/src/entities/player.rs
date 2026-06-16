@@ -102,12 +102,17 @@ pub(crate) async fn authenticate(
         .await
         .map_err(Error::Db)?
         .ok_or_else(Error::Authorization)?;
+    let id = player.id;
 
     if !verify_password(password, player.password_hash) {
+        log::warn!("Player {id} tried to authenticate with wrong password"); // Task 1.1
+        // log::warn!(id; "Player {id} tried to authenticate with wrong password"); // Task 4.2
         return Err(Error::Authorization());
     }
 
-    create_jwt(player.id, player.name)
+    log::debug!("Player {id} signed in successfully"); // Task 1.1
+    // log::warn!(id; "Player {id} signed in successfully"); // Task 4.2
+    create_jwt(id, player.name)
 }
 
 pub(crate) async fn change_name(
@@ -126,9 +131,11 @@ pub(crate) async fn change_password(
 ) -> Result<Model, Error> {
     validate_password(new_password.clone())?;
 
-    let mut player: ActiveModel = get(db, id).await?.into();
+    let mut player: ActiveModel = get(db, id.clone()).await?.into();
 
     if !verify_password(old_password, player.password_hash.unwrap()) {
+        log::warn!("Player {id} tried to authenticate with wrong password"); // Task 1.1
+        // log::warn!(id; "Player {id} tried to authenticate with wrong password"); // Task 4.2
         return Err(Error::Validation("old_password is not correct".to_string()));
     }
 
