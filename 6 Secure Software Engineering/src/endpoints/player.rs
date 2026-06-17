@@ -23,7 +23,9 @@ async fn create(
         Ok(entity) => Ok(HttpResponse::Created().json(player::Dto::from(entity))),
         Err(Error::Validation(msg)) => Ok(HttpResponse::BadRequest().body(msg)),
         Err(Error::Duplicate(msg)) => Ok(HttpResponse::Conflict().body(msg)),
-        Err(_) => {
+        Err(err) => {
+            log::error!("POST /players failed: {err:?}"); // Task 1.1
+            // log::error!(err: debug; "POST /players failed"); // Task 4.2
             Err(ErrorInternalServerError("An unexpected error occurred"))
         }
     }
@@ -39,7 +41,9 @@ async fn get_me(
     match res {
         Ok(entity) => Ok(HttpResponse::Ok().json(player::Dto::from(entity))),
         Err(Error::NotFound()) => Ok(HttpResponse::NotFound().finish()),
-        Err(_) => {
+        Err(err) => {
+            log::error!("GET /players/me failed: {err:?}"); // Task 1.1
+            // log::error!(err: debug; "GET /players/me failed"); // Task 4.2
             Err(ErrorInternalServerError("An unexpected error occurred"))
         }
     }
@@ -55,7 +59,9 @@ async fn get_player(
     match res {
         Ok(entity) => Ok(HttpResponse::Ok().json(player::Dto::from(entity))),
         Err(Error::NotFound()) => Ok(HttpResponse::NotFound().finish()),
-        Err(_) => {
+        Err(err) => {
+            log::error!("GET /players/{{id}} failed: {err:?}"); // Task 1.1
+            // log::error!(err: debug; "GET /players/{{id}} failed"); // Task 4.2
             Err(ErrorInternalServerError("An unexpected error occurred"))
         }
     }
@@ -82,7 +88,9 @@ async fn auth(
     match res {
         Ok(jwt) => Ok(HttpResponse::Ok().json(AuthResponse { access_token: jwt })),
         Err(Error::Authorization()) => Ok(HttpResponse::Unauthorized().finish()),
-        Err(_) => {
+        Err(err) => {
+            log::error!("POST /players/me/auth failed: {err:?}"); // Task 1.1
+            // log::error!(err: debug; "POST /players/me/auth failed"); // Task 4.2
             Err(ErrorInternalServerError("An unexpected error occurred"))
         }
     }
@@ -106,7 +114,9 @@ async fn change_name(
         Err(Error::NotFound()) => Ok(HttpResponse::NotFound().finish()),
         Err(Error::Validation(msg)) => Ok(HttpResponse::BadRequest().body(msg)),
         Err(Error::Duplicate(msg)) => Ok(HttpResponse::Conflict().body(msg)),
-        Err(_) => {
+        Err(err) => {
+            log::error!("PATCH /players/me/name failed: {err:?}"); // Task 1.1
+            // log::error!(err: debug; "PATCH /players/me/name failed"); // Task 4.2
             Err(ErrorInternalServerError("An unexpected error occurred"))
         }
     }
@@ -136,7 +146,9 @@ async fn change_password(
         Ok(entity) => Ok(HttpResponse::Ok().json(player::Dto::from(entity))),
         Err(Error::NotFound()) => Ok(HttpResponse::NotFound().finish()),
         Err(Error::Validation(msg)) => Ok(HttpResponse::BadRequest().body(msg)),
-        Err(_) => {
+        Err(err) => {
+            log::error!("PATCH /players/me/password failed: {err:?}"); // Task 1.1
+            // log::error!(err: debug; "PATCH /players/me/password failed"); // Task 4.2
             Err(ErrorInternalServerError("An unexpected error occurred"))
         }
     }

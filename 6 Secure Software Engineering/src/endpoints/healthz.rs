@@ -4,7 +4,11 @@ use sea_orm::DatabaseConnection;
 
 #[get("/healthz")]
 async fn healthz(db: web::Data<DatabaseConnection>) -> actix_web::Result<impl Responder> {
-    db.ping().await.map_err(ErrorServiceUnavailable)?;
+    db.ping().await.map_err(|err| {
+        log::warn!("GET /healthz failed: Failed to ping database: {}", err); // Task 1.1
+        // log::warn!(err: err; "GET /healthz failed: Failed to ping database"); // Task 4.2
+        ErrorServiceUnavailable(err)
+    })?;
 
     Ok(HttpResponse::Ok().body("Healthy"))
 }
