@@ -1,0 +1,62 @@
+article:not(:last-child) {
+    margin-bottom: 3rem;
+}
+
+/*region Heading*/
+.blog-heading {
+    display: flex;
+    gap: 1rem;
+
+    & h3 {
+        margin: 0;
+
+        font-weight: 500;
+    }
+}
+
+.blog-date {
+    width: 5rem;
+    height: 5rem;
+    flex: none;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    background: var(--tertiary2);
+    user-select: none;
+    font-weight: 600;
+    line-height: normal;
+}
+
+.blog-day {
+    font-size: 2rem;
+}
+
+/*endregion*/
+
+/*region Controls*/
+.blog-controls {
+    display: flex;
+    gap: 0.5rem;
+    float: right;
+
+    & button {
+        all: unset;
+        width: 1.5rem;
+        height: 1.5rem;
+
+        display: grid;
+        place-content: center;
+        background: var(--tertiary1);
+        color: var(--primary2);
+        cursor: pointer;
+
+        &:hover {
+            background: black;
+        }
+    }
+}
+
+/*endregion*/

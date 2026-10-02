@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="de">
+<!-- Achtung: Textdatei "ajax.txt" muss vorhanden sein, Inhalt: beliebig -->
+<!-- Achtung: Funktioniert nur mit Webserver bzw. "Live-Server", da lokale -->
+<!-- Textdatei inzwischen sog. CORS-Error verursacht -->
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ajax - Einfache Textdatei auslesen</title>
+
+    <script>
+        function init() {
+            const button1 = document.querySelector("#myButton");
+            button1.addEventListener("click", loadFileViaAjax);
+        }
+
+        function loadFileViaAjax() {
+            // XMLHttpRequest-Objekt erzeugen
+            const myRequest = new XMLHttpRequest();
+
+            // Der “onload”-Event tritt ein, wenn die Response vom Server ordnungsgemäß
+            // beim Client (Browser) angekommen ist. Dann wird die hinterlegte
+            // „Callback“-Funktion aufgerufen.
+            // In dieser wird der Inhalt des h1-Elements mit Hilfe von innerHTML durch
+            // den empfangenen Text (responseText) ersetzt
+            myRequest.onload = function () {
+                document.getElementById("myHeader").innerHTML = myRequest.responseText;
+            }
+
+            // Festlegen der Request-Methode (GET, POST...) und der Request-URL
+            // (hier lediglich ein Dateiname).
+            // Standardmäßig wird ein asynchroner Request ausgelöst.
+            myRequest.open("GET", "ajax.txt");
+
+            // Request senden. Bei POST kann send() einen String übergeben
+            // (= Request-Body)
+            myRequest.send();
+        }
+
+        window.onload = init;
+    </script>
+</head>
+
+<body>
+    <h1 id="myHeader">Textänderung über Ajax</h1>
+    <button id="myButton">Go!</button>
+</body>
+</html>

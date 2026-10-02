@@ -1,0 +1,71 @@
+* {
+    box-sizing: border-box;
+}
+
+html, body, nav, nav ul {
+    padding: 0;
+    margin: 0;
+}
+
+body {
+    font-family: sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+}
+
+/*region nav*/
+nav {
+    background-color: rgb(180, 193, 169);
+}
+
+nav ul {
+    display: flex;
+}
+
+nav li {
+    padding: 8px;
+    list-style-type: none;
+}
+
+nav a {
+    text-decoration: none;
+    color: black;
+}
+
+.nav-current {
+    font-weight: bold;
+}
+/*endregion nav*/
+
+main {
+    display: flex;
+    width: fit-content;
+    margin: 8px auto;
+}
+
+aside {
+    width: 250px;
+}
+
+article {
+    width: 750px;
+    margin: 0 8px;
+}
+
+.toc-header {
+    font-weight: bold;
+    font-size: 1.2em;
+}
+
+footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    padding: 8px;
+
+    background-color: rgb(180, 193, 169);
+}
+
+footer a {
+    color: black;
+}

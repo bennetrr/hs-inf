@@ -1,0 +1,63 @@
+<template id="shell-template">
+    <link rel="stylesheet" href="/assets/styles/main.css">
+    <link rel="stylesheet" href="/assets/styles/shell.css">
+    <link rel="stylesheet" href="/assets/fontawesome/css/all.min.css">
+
+    <div class="shell" data-nav-state="closed">
+        <header>
+            <nav>
+                <ul>
+                    <li><a href="/" class="nav-link">Über mich</a></li>
+                    <li><a href="/kompetenzen.html" class="nav-link">Kompetenzen</a></li>
+                    <li><a href="/blog.html" class="nav-link">Blog</a></li>
+                    <li><a href="/kontakt.html" class="nav-link">Kontakt</a></li>
+                </ul>
+
+                <div role="button" id="nav-hamburger">
+                    <div class="bar1"></div>
+                    <div class="bar2"></div>
+                    <div class="bar3"></div>
+                </div>
+            </nav>
+
+            <div id="page-header">
+                <h1 id="page-title"></h1>
+
+                <div id="logo-container">
+                    <span>Bennet Ranft</span>
+                    <span>Portfolio</span>
+                </div>
+            </div>
+        </header>
+
+        <div id="content-container">
+            <main>
+                <slot></slot>
+            </main>
+
+            <aside>
+                <slot name="aside"></slot>
+            </aside>
+        </div>
+
+        <footer>
+            <a href="https://x.com/bennetrrrr" target="_blank" aria-label="X/Twitter">
+                <i class="fab fa-x-twitter" style="--footer-link-color: #000000"></i>
+            </a>
+            <a href="https://www.linkedin.com/in/bennet-ranft-b352182b6/" target="_blank" aria-label="LinkedIn">
+                <i class="fab fa-linkedin" style="--footer-link-color: rgb(90, 176, 247)"></i>
+            </a>
+            <a href="https://github.com/bennetrr" target="_blank" aria-label="GitHub">
+                <i class="fab fa-github" style="--footer-link-color: #000000"></i>
+            </a>
+            <a href="https://bennetr.me" target="_blank" aria-label="Website">
+                <i class="fa fa-globe" style="--footer-link-color: #10b981"></i>
+            </a>
+
+            <div class="flex-placeholder"></div>
+
+            <a href="#">Netzwerk</a>
+            <a href="#">Impressum</a>
+        </footer>
+    </div>
+</template>

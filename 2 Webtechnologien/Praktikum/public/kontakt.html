@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="de">
+    <head>
+        <meta charset="UTF-8">
+        <meta content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0" name="viewport">
+        <meta content="ie=edge" http-equiv="X-UA-Compatible">
+        <title>Kontakt | Bennet Ranft</title>
+
+        <link rel="stylesheet" href="/assets/styles/main.css">
+        <link rel="stylesheet" href="/assets/styles/contact.css">
+        <link rel="stylesheet" href="/assets/fontawesome/css/all.min.css">
+        <script src="/assets/scripts/shell.js"></script>
+        <script src="/assets/scripts/contact.js"></script>
+    </head>
+    <body>
+        <portfolio-shell>
+            <form action="#" method="post" id="contact-form">
+                <div id="vorname-container">
+                    <label for="vorname">Vorname</label>
+                    <input type="text" name="vorname" id="vorname">
+                    <span id="vorname-error"></span>
+                </div>
+
+                <div id="nachname-container">
+                    <label for="nachname">Nachname</label>
+                    <input type="text" name="name" id="nachname">
+                    <span id="nachname-error"></span>
+                </div>
+
+                <div id="email-container">
+                    <label for="email">E-Mail-Adresse</label>
+                    <input type="email" name="email" id="email">
+                    <span id="email-error"></span>
+                </div>
+
+                <div id="nachricht-container">
+                    <label for="nachricht">Nachricht</label>
+                    <textarea name="nachricht" id="nachricht"></textarea>
+                    <span id="nachricht-error"></span>
+                </div>
+
+                <div class="button-container">
+                    <span id="submit-status"></span>
+                    <button type="reset">Formular zurücksetzen</button>
+                    <button type="submit">Absenden</button>
+                </div>
+            </form>
+
+            <section slot="aside">
+                <h2>Kontaktdaten</h2>
+                <div class="alternate-bold">
+                    <p>
+                        <span>Email<br></span>
+                        <span><a href="#" target="_blank">redacted</a></span>
+                    </p>
+                    <p>
+                        <span>Telefon<br></span>
+                        <span><a href="#" target="_blank">redacted</a></span>
+                    </p>
+                    <p>
+                        <span>Discord<br></span>
+                        <span><a href="#" target="_blank">redacted</a></span>
+                    </p>
+                </div>
+            </section>
+        </portfolio-shell>
+    </body>
+</html>

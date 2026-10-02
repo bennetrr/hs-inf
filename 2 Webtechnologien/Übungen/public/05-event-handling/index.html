@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="de">
+    <head>
+        <meta charset="utf-8">
+        <meta content="width=device-width, initial-scale=1.0" name="viewport">
+        <title>DOM - Aufbau Seite per JS</title>
+        <style>
+            .wichtig {
+                color: red;
+            }
+
+            .nochWichtiger {
+                font-weight: bold;
+            }
+
+            #absatz {
+                font-size: 30px;
+            }
+        </style>
+    </head>
+    <body>
+        <script>
+            let count = 0;
+
+            function achtung() {
+                if (count % 2 === 0) {
+                    this.style.backgroundColor = "yellow";
+                } else {
+                    this.style.backgroundColor = "white";
+                }
+
+                count++;
+            }
+
+            // Absatz
+            const p = document.createElement("p");
+            p.id = "absatz";
+            p.addEventListener("click", achtung);
+            p.appendChild(document.createTextNode("Absatz"));
+
+            // Liste
+            const ul = document.createElement("ul");
+
+            // Element 1
+            const li1 = document.createElement("li");
+            li1.appendChild(document.createTextNode("Erstes Listen-Element"));
+            li1.style.textDecorationLine = "line-through";
+            ul.appendChild(li1);
+
+            // Element 2
+            const li2 = document.createElement("li");
+            li2.appendChild(document.createTextNode("Zweites Listen-Element"));
+            li2.classList.add("wichtig", "nochWichtiger");
+            ul.appendChild(li2);
+
+            // Element 3
+            const li3 = document.createElement("li");
+            ul.appendChild(li3);
+
+            // Alles zum DOM hinzufügen
+            document.body.appendChild(p);
+            document.body.appendChild(ul);
+        </script>
+    </body>
+</html>

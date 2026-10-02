@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Purchase List</title>
+
+        <style>
+            * {
+                box-sizing: border-box;
+            }
+
+            html {
+                font-family: Inter, sans-serif;
+            }
+
+            table {
+                border-collapse: collapse;
+                margin-bottom: 8px;
+            }
+
+            td, th {
+                padding: 8px 16px;
+                text-align: start;
+                vertical-align: top;
+                border: 1px solid black;
+            }
+        </style>
+
+        <script>
+            const d = document;
+
+            /**
+             * @param {string} lines
+             * @returns HTMLSpanElement
+             */
+            function textToHtml(...lines) {
+                return textListToHtml(lines);
+            }
+
+            /**
+             * @param {string[]} lines
+             * @returns HTMLSpanElement
+             */
+            function textListToHtml(lines) {
+                /** @type HTMLSpanElement */
+                const span = d.createElement('span');
+
+                lines.forEach((line, i) => {
+                    span.appendChild(d.createTextNode(line));
+
+                    if (i < lines.length - 1) {
+                        span.appendChild(d.createElement('br'));
+                    }
+                });
+
+                return span;
+            }
+
+            /**
+             * @typedef T
+             * @typedef R
+             * @param {T[]} list
+             * @param {(item: T) => R} callback
+             * @returns {R[]}
+             */
+            function map(list, callback) {
+                const result = [];
+
+                for (let listElement of list) {
+                    result.push(callback(listElement));
+                }
+
+                return result;
+            }
+
+            function loadOrdersXML() {
+                const request = new XMLHttpRequest();
+                request.responseType = 'document';
+
+                request.onload = () => {
+                    /** @type Document */
+                    const response = request.responseXML;
+                    /** @type HTMLTableSectionElement */
+                    const table = document.getElementById('orders-table-body');
+                    /** @type HTMLCollection */
+                    const orders = response.getElementsByTagName('PurchaseOrder');
+
+                    table.replaceChildren();
+
+                    for (let order of orders) {
+                        const row = document.createElement('tr');
+
+                        // Order number
+                        const orderNumberCell = d.createElement('td');
+                        orderNumberCell.appendChild(d.createTextNode(order.getAttribute('PurchaseOrderNumber')));
+                        row.appendChild(orderNumberCell);
+
+                        // Order date
+                        const orderDateCell = d.createElement('td');
+                        orderDateCell.appendChild(d.createTextNode(order.getAttribute('OrderDate')));
+                        row.appendChild(orderDateCell);
+
+                        // Shipping address
+                        const shippingAddressCell = d.createElement('td');
+                        const shippingAddressData = order.querySelector('Address[Type="Shipping"]');
+                        shippingAddressCell.appendChild(textToHtml(
+                            shippingAddressData.getElementsByTagName('Name')[0].textContent,
+                            shippingAddressData.getElementsByTagName('Street')[0].textContent,
+                            shippingAddressData.getElementsByTagName('City')[0].textContent,
+                            shippingAddressData.getElementsByTagName('State')[0].textContent,
+                            shippingAddressData.getElementsByTagName('Zip')[0].textContent,
+                            shippingAddressData.getElementsByTagName('Country')[0].textContent,
+                        ));
+                        row.appendChild(shippingAddressCell);
+
+                        // Billing address
+                        const billingAddressCell = d.createElement('td');
+                        const billingAddressData = order.querySelector('Address[Type="Billing"]');
+                        billingAddressCell.appendChild(textToHtml(
+                            billingAddressData.getElementsByTagName('Name')[0].textContent,
+                            billingAddressData.getElementsByTagName('Street')[0].textContent,
+                            billingAddressData.getElementsByTagName('City')[0].textContent,
+                            billingAddressData.getElementsByTagName('State')[0].textContent,
+                            billingAddressData.getElementsByTagName('Zip')[0].textContent,
+                            billingAddressData.getElementsByTagName('Country')[0].textContent,
+                        ));
+                        row.appendChild(billingAddressCell);
+
+                        // Delivery note
+                        const deliveryNoteCell = d.createElement('td');
+                        if (order.getElementsByTagName('DeliveryNotes').length) {
+                            deliveryNoteCell.appendChild(d.createTextNode(order.getElementsByTagName('DeliveryNotes')[0].textContent));
+                        }
+                        row.appendChild(deliveryNoteCell);
+
+                        // Items
+                        const itemsCell = d.createElement('td');
+                        itemsCell.appendChild(textListToHtml(
+                            map(order.getElementsByTagName('Item'), item =>
+                                `${item.getElementsByTagName('Quantity')[0].textContent}x ${item.getAttribute('PartNumber')}    ${item.getElementsByTagName('ProductName')[0].textContent}    $ ${item.getElementsByTagName('USPrice')[0].textContent}`
+                            )
+                        ))
+                        row.appendChild(itemsCell);
+
+                        table.appendChild(row);
+                    }
+                };
+
+                request.open("GET", "orders.xml", true);
+                request.send();
+            }
+
+            function loadOrdersJSON() {
+                const request = new XMLHttpRequest();
+                request.responseType = "application/json";
+
+                request.onload = () => {
+                    /**
+                     * @type Document
+                     */
+                    const response = JSON.parse(request.responseText);
+                    /**
+                     * @type HTMLTableSectionElement
+                     */
+                    const table = document.getElementById("orders-table-body");
+
+                    table.replaceChildren();
+
+                    for (let order of response) {
+                        const row = d.createElement('tr');
+
+                        // Order number
+                        const orderNumberCell = d.createElement('td');
+                        orderNumberCell.appendChild(d.createTextNode(order.PurchaseOrderNumber));
+                        row.appendChild(orderNumberCell);
+
+                        // Order date
+                        const orderDateCell = d.createElement('td');
+                        orderDateCell.appendChild(d.createTextNode(order.OrderDate));
+                        row.appendChild(orderDateCell);
+
+                        // Shipping address
+                        const shippingAddressCell = d.createElement('td');
+                        const shippingAddressData = order.Addresses.Shipping;
+                        shippingAddressCell.appendChild(textToHtml(
+                            shippingAddressData.Name,
+                            shippingAddressData.Street,
+                            shippingAddressData.City,
+                            shippingAddressData.State,
+                            shippingAddressData.Zip,
+                            shippingAddressData.Country,
+                        ));
+                        row.appendChild(shippingAddressCell);
+
+                        // Billing address
+                        const billingAddressCell = d.createElement('td');
+                        const billingAddressData = order.Addresses.Billing;
+                        billingAddressCell.appendChild(textToHtml(
+                            billingAddressData.Name,
+                            billingAddressData.Street,
+                            billingAddressData.City,
+                            billingAddressData.State,
+                            billingAddressData.Zip,
+                            billingAddressData.Country,
+                        ));
+                        row.appendChild(billingAddressCell);
+
+                        // Delivery note
+                        const deliveryNoteCell = d.createElement('td');
+                        if (order.DeliveryNotes) {
+                            deliveryNoteCell.appendChild(d.createTextNode(order.DeliveryNotes));
+                        }
+                        row.appendChild(deliveryNoteCell);
+
+                        // Items
+                        const itemsCell = d.createElement('td');
+                        itemsCell.appendChild(textListToHtml(
+                            order.Items.map(item =>
+                                `${item.Quantity}x ${item.PartNumber}    ${item.ProductName}    $ ${item.USPrice}`
+                            )
+                        ));
+                        row.appendChild(itemsCell);
+
+                        table.appendChild(row);
+                    }
+                };
+
+                request.open("GET", "orders.json", true);
+                request.send();
+            }
+        </script>
+    </head>
+    <body>
+        <table id="orders-table">
+            <thead>
+                <tr>
+                    <th>Order Number</th>
+                    <th>Order Date</th>
+                    <th>Shipping Address</th>
+                    <th>Billing Address</th>
+                    <th>Delivery Note</th>
+                    <th>Items</th>
+                </tr>
+            </thead>
+            <tbody id="orders-table-body">
+
+            </tbody>
+        </table>
+
+        <button onclick="loadOrdersXML()">
+            Load purchases from XML
+        </button>
+
+        <button onclick="loadOrdersJSON()">
+            Load purchases from JSON
+        </button>
+    </body>
+</html>
