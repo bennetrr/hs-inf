@@ -1,0 +1,33 @@
+name: Test build
+
+on:
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  container-webapp:
+    name: Build WebApp container
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build container
+        uses: ./.github/actions/containers/build
+        with:
+          push: 'false'
+          context: webapp
+
+  container-api:
+    name: Build API container
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build container
+        uses: ./.github/actions/containers/build
+        with:
+          push: 'false'
+          context: api
+          file: api/CloudComputing.Api/Dockerfile

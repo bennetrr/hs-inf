@@ -1,0 +1,89 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - release
+
+jobs:
+  setup:
+    name: Setup
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    outputs:
+      next-version: ${{ steps.get-release-version.outputs.version }}
+      next-version-name: ${{ steps.get-release-version.outputs.version-name }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: wemogy/get-release-version-action@v4.3.2
+        id: get-release-version
+        with:
+          prefix: v
+          create-tag: 'true'
+          git-username: bennetrr
+          git-email: 76742318+bennetrr@users.noreply.github.com
+          mode: semantic
+
+  build-webapp:
+    name: Build WebApp containers
+    needs: [ setup ]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build container
+        uses: ./.github/actions/containers/build
+        with:
+          registry-server: ${{ secrets.AWS_ECR_SERVER }}
+          registry-user: ${{ secrets.AWS_ECR_USER }}
+          registry-password: ${{ secrets.AWS_ECR_PASSWORD }}
+          name: cloudc-1/webapp
+          version: ${{ needs.setup.outputs.next-version-name }}
+          context: webapp
+          push: 'true'
+
+  build-api:
+    name: Build API containers
+    needs: [ setup ]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build container
+        uses: ./.github/actions/containers/build
+        with:
+          registry-server: ${{ secrets.AWS_ECR_SERVER }}
+          registry-user: ${{ secrets.AWS_ECR_USER }}
+          registry-password: ${{ secrets.AWS_ECR_PASSWORD }}
+          name: cloudc-1/api
+          version: ${{ needs.setup.outputs.next-version-name }}
+          context: api
+          file: api/CloudComputing.Api/Dockerfile
+          push: 'true'
+
+  github-release:
+    name: Create GitHub release
+    needs:
+      - setup
+      - build-webapp
+      - build-api
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Create GitHub release
+        uses: ncipollo/release-action@v1
+        with:
+          name: Version ${{ needs.setup.outputs.next-version }}
+          tag: ${{ needs.setup.outputs.next-version-name }}
+          prerelease: ${{ github.event.inputs.pre-release || false }}
+          generateReleaseNotes: true
+          commit: ${{ github.head_ref || github.ref_name }}

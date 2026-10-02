@@ -1,0 +1,72 @@
+name: Build container
+description: Build and optionally push a container image
+
+inputs:
+  registry-server:
+    description: Container registry server
+    required: false
+  registry-user:
+    description: Container registry username
+    required: false
+  registry-password:
+    description: Container registry password
+    required: false
+  name:
+    description: Name of the container image
+    required: false
+  version:
+    description: Version of the container image (with prefix)
+    required: false
+  file:
+    description: Path to Dockerfile
+    required: false
+  context:
+    description: Working / context directory for the build process (without trailing slash)
+    required: false
+    default: .
+  push:
+    description: Whether to push the container image to the registry
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Prepare
+      run: |
+        registry_image=${{ inputs.registry-server }}/${{ inputs.name }}
+        echo "REGISTRY_IMAGE=$registry_image" >> $GITHUB_ENV
+        echo "FULL_IMAGE_NAME=${registry_image//\//-}" >> $GITHUB_ENV
+      shell: bash
+
+    - name: Docker meta
+      id: meta
+      uses: docker/metadata-action@v5
+      if: ${{ inputs.push == 'true' }}
+      with:
+        images: ${{ env.REGISTRY_IMAGE }}
+        flavor: |
+          latest=false
+        tags: |
+          type=raw,value=${{ inputs.version }}
+          type=sha
+
+    - name: Set up buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Login to container registry
+      uses: docker/login-action@v3
+      if: ${{ inputs.push == 'true' }}
+      with:
+        registry: ${{ inputs.registry-server }}
+        username: ${{ inputs.registry-user }}
+        password: ${{ inputs.registry-password }}
+
+    - name: Build container
+      id: build
+      uses: docker/build-push-action@v5
+      with:
+        tags: ${{ steps.meta.outputs.tags || '' }}
+        labels: ${{ steps.meta.outputs.labels || '' }}
+        file: ${{ inputs.file }}
+        context: ${{ inputs.context }}
+        push: ${{ inputs.push }}
