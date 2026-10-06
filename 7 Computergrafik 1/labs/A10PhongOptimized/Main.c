@@ -7,14 +7,14 @@
 int main()
 {
 #ifdef WIN32
-  omp_set_num_threads(omp_get_max_threads());
+    omp_set_num_threads(omp_get_max_threads());
 #endif
-  CGWindow cgwindow = {0};
-  CreateCGWindow(&cgwindow, 512, 512, "Optimized", &RenderScene);
-  LoadSimpleMeshIO("../../../data/Bunny.smm", &mesh);
+    CGWindow cgwindow = { 0 };
+    CreateCGWindow(&cgwindow, 512, 512, "Optimized", &RenderScene);
+    LoadSimpleMeshIO("../../../data/Bunny.smm", &mesh);
 
-  RunCGWindow(&cgwindow);
-  DestroyCGWindow(&cgwindow);
+    RunCGWindow(&cgwindow);
+    DestroyCGWindow(&cgwindow);
 
-  return 0;
+    return 0;
 }

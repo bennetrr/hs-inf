@@ -5,10 +5,10 @@
 
 int main()
 {
-  CGWindow cgwindow = {0};
-  CreateCGWindow(&cgwindow, 512, 512, "Gouraud Shading", &RenderScene);
-  LoadSimpleMeshIO("../../../data/Sphere3.smm", &mesh);  
-  RunCGWindow(&cgwindow);
-  DestroyCGWindow(&cgwindow);
-  return 0;
+    CGWindow cgwindow = { 0 };
+    CreateCGWindow(&cgwindow, 512, 512, "Gouraud Shading", &RenderScene);
+    LoadSimpleMeshIO("../../../data/Sphere3.smm", &mesh);
+    RunCGWindow(&cgwindow);
+    DestroyCGWindow(&cgwindow);
+    return 0;
 }

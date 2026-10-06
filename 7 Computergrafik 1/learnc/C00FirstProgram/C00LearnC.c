@@ -1,7 +1,8 @@
-#include <stdint.h>
-#include <stdlib.h>
+#include <stdio.h>
 
 int main(int argc, char** argv)
 {
-  return 0;
+    int32_t x = 42;
+    printf("Hello World, %d", x);
+    return 0;
 }

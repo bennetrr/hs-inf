@@ -5,119 +5,119 @@
 
 static int32_t RandomPoints(PixelBuffer p)
 {
-  for (int32_t y = 0; y < p.height; y++)
+    for (int32_t y = 0; y < p.height; y++)
 
-  {
-    for (int32_t x = 0; x < p.width; x++)
     {
-      int32_t ofs   = y * p.width + x;
-      uint8_t r     = rand();
-      uint8_t g     = rand();
-      uint8_t b     = rand();
-      p.pixels[ofs] = Color(r, g, b);
+        for (int32_t x = 0; x < p.width; x++)
+        {
+            int32_t ofs   = y * p.width + x;
+            uint8_t r     = rand();
+            uint8_t g     = rand();
+            uint8_t b     = rand();
+            p.pixels[ofs] = Color(r, g, b);
+        }
     }
-  }
-  return 1;
+    return 1;
 }
 
 static int32_t GradientX(PixelBuffer p)
 {
-  for (int32_t y = 0; y < p.height; y++)
+    for (int32_t y = 0; y < p.height; y++)
 
-  {
-    for (int32_t x = 0; x < p.width; x++)
     {
-      float   xf    = (float)(x) / (float)(p.width);
-      int32_t ofs   = y * p.width + x;
-      uint8_t r     = (uint8_t)(xf * 255.0f + 0.5f);
-      uint8_t g     = 0;
-      uint8_t b     = 0;
-      p.pixels[ofs] = Color(r, g, b);
+        for (int32_t x = 0; x < p.width; x++)
+        {
+            float   xf    = (float)(x) / (float)(p.width);
+            int32_t ofs   = y * p.width + x;
+            uint8_t r     = (uint8_t)(xf * 255.0f + 0.5f);
+            uint8_t g     = 0;
+            uint8_t b     = 0;
+            p.pixels[ofs] = Color(r, g, b);
+        }
     }
-  }
-  return 1;
+    return 1;
 }
 
 static int32_t GradientXY(PixelBuffer p)
 {
-  for (int32_t y = 0; y < p.height; y++)
+    for (int32_t y = 0; y < p.height; y++)
 
-  {
-    for (int32_t x = 0; x < p.width; x++)
     {
-      float   xf    = (float)(x) / (float)(p.width);
-      float   yf    = (float)(y) / (float)(p.height);
-      int32_t ofs   = y * p.width + x;
-      uint8_t r     = (uint8_t)(xf * 255.0f + 0.5f);
-      uint8_t g     = (uint8_t)(yf * 255.0f + 0.5f);
-      uint8_t b     = 0;
-      p.pixels[ofs] = Color(r, g, b);
+        for (int32_t x = 0; x < p.width; x++)
+        {
+            float   xf    = (float)(x) / (float)(p.width);
+            float   yf    = (float)(y) / (float)(p.height);
+            int32_t ofs   = y * p.width + x;
+            uint8_t r     = (uint8_t)(xf * 255.0f + 0.5f);
+            uint8_t g     = (uint8_t)(yf * 255.0f + 0.5f);
+            uint8_t b     = 0;
+            p.pixels[ofs] = Color(r, g, b);
+        }
     }
-  }
-  return 1;
+    return 1;
 }
 
 static int32_t Circle(PixelBuffer p)
 {
-  for (int32_t y = 0; y < p.height; y++)
+    for (int32_t y = 0; y < p.height; y++)
 
-  {
-    for (int32_t x = 0; x < p.width; x++)
     {
-      float cx = (cosf(0.001f * p.time));
-      ;
-      float cy = (sinf(0.001f * p.time));
-      ;
+        for (int32_t x = 0; x < p.width; x++)
+        {
+            float cx = (cosf(0.001f * p.time));
+            ;
+            float cy = (sinf(0.001f * p.time));
+            ;
 
-      float   xf  = -1.0f + 2.0f * (float)(x) / (float)(p.width) - cx;
-      float   yf  = -1.0f + 2.0f * (float)(y) / (float)(p.height) - cy;
-      int32_t ofs = y * p.width + x;
-      float   h   = xf * xf + yf * yf - fabsf(sinf(0.0001f * p.time));
-      if (h >= 0)
-      {
-        p.pixels[ofs] = Color((uint32_t)(h * 255.0f), 0, 0);
-      }
-      else
-      {
-        p.pixels[ofs] = Color(0, (uint32_t)(-h * 255.0f), 0);
-      }
+            float   xf  = -1.0f + 2.0f * (float)(x) / (float)(p.width) - cx;
+            float   yf  = -1.0f + 2.0f * (float)(y) / (float)(p.height) - cy;
+            int32_t ofs = y * p.width + x;
+            float   h   = xf * xf + yf * yf - fabsf(sinf(0.0001f * p.time));
+            if (h >= 0)
+            {
+                p.pixels[ofs] = Color((uint32_t)(h * 255.0f), 0, 0);
+            }
+            else
+            {
+                p.pixels[ofs] = Color(0, (uint32_t)(-h * 255.0f), 0);
+            }
+        }
     }
-  }
-  return 1;
+    return 1;
 }
 
 static int32_t RotoZoom(PixelBuffer p)
 {
-  int32_t ofs    = 0;
-  float   t      = 0.001f * p.time;
-  float   cx     = sinf(1.0f * t);
-  float   cy     = cosf(1.0f * t);
-  float   aspect = (float)p.height / p.width;
+    int32_t ofs    = 0;
+    float   t      = 0.001f * p.time;
+    float   cx     = sinf(1.0f * t);
+    float   cy     = cosf(1.0f * t);
+    float   aspect = (float)p.height / p.width;
     for (int32_t y = 0; y < p.height; y++)
 
-  {
-      float yf = (-1.0f + 2.0f * (float)(y) / (float)(p.height)) * aspect;
-  for (int32_t x = 0; x < p.width; x++)
     {
-    float xf = -1.0f + 2.0f * (float)(x) / (float)(p.width);
+        float yf = (-1.0f + 2.0f * (float)(y) / (float)(p.height)) * aspect;
+        for (int32_t x = 0; x < p.width; x++)
+        {
+            float xf = -1.0f + 2.0f * (float)(x) / (float)(p.width);
 
-      float xt = cosf(t) * (xf + cx) - sinf(t) * (yf + cy);
-      float yt = sinf(t) * (xf + cx) + cosf(t) * (yf + cy);
+            float xt = cosf(t) * (xf + cx) - sinf(t) * (yf + cy);
+            float yt = sinf(t) * (xf + cx) + cosf(t) * (yf + cy);
 
-      xt *= 1.1f + sinf(0.5f * t);
-      yt *= 1.1f + sinf(0.5f * t);
+            xt *= 1.1f + sinf(0.5f * t);
+            yt *= 1.1f + sinf(0.5f * t);
 
-      float u = (xt + 1.0f) * 0.5f;
-      float v = (yt + 1.0f) * 0.5f;
+            float u = (xt + 1.0f) * 0.5f;
+            float v = (yt + 1.0f) * 0.5f;
 
-      uint8_t tu = (int)(u * 255 + 0.5f);
-      uint8_t tv = (int)(v * 255 + 0.5f);
-      uint8_t c  = tu ^ tv;
+            uint8_t tu = (int)(u * 255 + 0.5f);
+            uint8_t tv = (int)(v * 255 + 0.5f);
+            uint8_t c  = tu ^ tv;
 
-      p.pixels[y*p.width+x] = Color(c, c, c);
+            p.pixels[y * p.width + x] = Color(c, c, c);
+        }
     }
-  }
-  return 1;
+    return 1;
 }
 
 /*
@@ -227,16 +227,16 @@ static int32_t Fire(PixelBuffer p)
     */
 int main()
 {
-  CGWindow            cgwindow = {0};
-  RenderSceneCallback renderSceneCallback;
-  renderSceneCallback =
-      // RandomPoints;
-      // GradientX;
-      // GradientXY;
-      // Circle;
-      RotoZoom;
-  CreateCGWindow(&cgwindow, 2048, 1024, "ImageProcessing", renderSceneCallback);
-  RunCGWindow(&cgwindow);
-  DestroyCGWindow(&cgwindow);
-  return 0;
+    CGWindow            cgwindow = { 0 };
+    RenderSceneCallback renderSceneCallback;
+    renderSceneCallback =
+        // RandomPoints;
+        // GradientX;
+        // GradientXY;
+        // Circle;
+        RotoZoom;
+    CreateCGWindow(&cgwindow, 2048, 1024, "ImageProcessing", renderSceneCallback);
+    RunCGWindow(&cgwindow);
+    DestroyCGWindow(&cgwindow);
+    return 0;
 }

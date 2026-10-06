@@ -5,10 +5,10 @@
 
 int main()
 {
-  CGWindow cgwindow = {0};
-  CreateCGWindow(&cgwindow, 512, 512, "Flat Shading", &RenderScene);
-  LoadSimpleMeshIO("../../../data/Bunny2k.smm", &mesh);
-  RunCGWindow(&cgwindow);
-  DestroyCGWindow(&cgwindow);
-  return 0;
+    CGWindow cgwindow = { 0 };
+    CreateCGWindow(&cgwindow, 512, 512, "Flat Shading", &RenderScene);
+    LoadSimpleMeshIO("../../../data/Bunny2k.smm", &mesh);
+    RunCGWindow(&cgwindow);
+    DestroyCGWindow(&cgwindow);
+    return 0;
 }

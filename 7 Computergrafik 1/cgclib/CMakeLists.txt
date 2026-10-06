@@ -29,7 +29,7 @@ if(UNIX AND NOT APPLE)
     endif()
 
 
-    
+
 endif()
 
 # Project includes
