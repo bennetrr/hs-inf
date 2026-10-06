@@ -32,6 +32,11 @@ if(UNIX AND NOT APPLE)
 
 endif()
 
+if(APPLE)
+    # tigr uses Cocoa (via the Objective-C runtime) and OpenGL on macOS
+    target_link_libraries(cgclib PUBLIC "-framework Cocoa" "-framework OpenGL")
+endif()
+
 # Project includes
 target_include_directories(cgclib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 

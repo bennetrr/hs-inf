@@ -9,7 +9,7 @@ function(CreateAssignment)
     # Gather all c and h files in this directory
     file(GLOB_RECURSE SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/*.c" "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
 
-    if(UNIX AND NOT APPLE)
+    if(UNIX)
         add_executable(${PROJECT_NAME} ${SOURCE_FILES})
         target_link_libraries(${PROJECT_NAME}  PRIVATE cgclib )
     endif()

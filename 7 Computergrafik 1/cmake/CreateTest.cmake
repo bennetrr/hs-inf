@@ -17,7 +17,7 @@ function(CreateTest)
     # Add executable. Make sure it is in WIN32
     list(APPEND SOURCE_FILES ${CT_SOURCES})
 
-    if(UNIX AND NOT APPLE)
+    if(UNIX)
         add_executable(${PROJECT_NAME} ${SOURCE_FILES})
         target_link_libraries(${PROJECT_NAME}  PRIVATE unity cgclib)
     endif()
