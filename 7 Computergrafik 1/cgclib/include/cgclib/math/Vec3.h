@@ -23,8 +23,11 @@ typedef struct
  */
 static inline Vec3 Add(Vec3 a, Vec3 b)
 {
-    // TODO: Implement me (Sheet A00, Assignment 1)
-    return (Vec3) { 0, 0, 0 };
+    return (Vec3) {
+        a.x + b.x,
+        a.y + b.y,
+        a.z + b.z,
+    };
 }
 
 /**
@@ -36,8 +39,11 @@ static inline Vec3 Add(Vec3 a, Vec3 b)
  */
 static inline Vec3 Sub(Vec3 a, Vec3 b)
 {
-    // TODO: Implement me (Sheet A00, Assignment 1)
-    return (Vec3) { 0, 0, 0 };
+    return (Vec3) {
+        a.x - b.x,
+        a.y - b.y,
+        a.z - b.z,
+    };
 }
 
 /**
@@ -53,8 +59,13 @@ static inline Vec3 Sub(Vec3 a, Vec3 b)
  */
 static inline Vec3 WeightedSum(float beta, float gamma, Vec3 a, Vec3 b, Vec3 c)
 {
-    // TODO: Implement me (Sheet A00, Assignment 1)
-    return (Vec3) { 0, 0, 0 };
+    const float alpha = 1 - beta - gamma;
+
+    return (Vec3) {
+        alpha * a.x + beta * b.x + gamma * c.x,
+        alpha * a.y + beta * b.y + gamma * c.y,
+        alpha * a.z + beta * b.z + gamma * c.z,
+    };
 }
 
 /**
@@ -66,8 +77,7 @@ static inline Vec3 WeightedSum(float beta, float gamma, Vec3 a, Vec3 b, Vec3 c)
  */
 static inline float Dot(Vec3 a, Vec3 b)
 {
-    // TODO: Implement me (Sheet A00, Assignment 1)
-    return 0.0f;
+    return a.x * b.x + a.y * b.y + a.z * b.z;
 }
 
 /**
@@ -79,8 +89,11 @@ static inline float Dot(Vec3 a, Vec3 b)
  */
 static inline Vec3 Scale(float s, Vec3 v)
 {
-    // TODO: Implement me (Sheet A00, Assignment 1)
-    return (Vec3) { 0, 0, 0 };
+    return (Vec3) {
+        s * v.x,
+        s * v.y,
+        s * v.z,
+    };
 }
 
 /**
@@ -92,8 +105,16 @@ static inline Vec3 Scale(float s, Vec3 v)
  */
 static inline Vec3 Cross(Vec3 a, Vec3 b)
 {
-    // TODO: Implement me (Sheet A00, Assignment 1)
-    return (Vec3) { 0, 0, 0 };
+    return (Vec3) {
+        a.y * b.z - a.z * b.y,
+        a.z * b.x - a.x * b.z,
+        a.x * b.y - a.y * b.x,
+    };
+}
+
+static inline float Sqf(float a)
+{
+    return powf(a, 2);
 }
 
 /**
@@ -104,8 +125,7 @@ static inline Vec3 Cross(Vec3 a, Vec3 b)
  */
 static inline float Length(Vec3 a)
 {
-    // TODO: Implement me (Sheet A00, Assignment 1)
-    return 0.0f;
+    return sqrtf(Sqf(a.x) + Sqf(a.y) + Sqf(a.z));
 }
 
 /**
@@ -116,8 +136,7 @@ static inline float Length(Vec3 a)
  */
 static inline Vec3 Normalize(Vec3 a)
 {
-    // TODO: Implement me (Sheet A00, Assignment 1)
-    return (Vec3) { 0, 0, 0 };
+    return Scale(1 / Length(a), a);
 }
 
 #endif
