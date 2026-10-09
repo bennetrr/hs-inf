@@ -41,5 +41,4 @@ Vec3 BlinnLighting(Vec3 normal, Vec3 lightDirection, Vec3 viewDirection, Vec3 co
  */
 Vec3 PhongLighting(Vec3 normal, Vec3 lightDirection, Vec3 viewDirection, Vec3 color, float shinyness);
 
-
 #endif

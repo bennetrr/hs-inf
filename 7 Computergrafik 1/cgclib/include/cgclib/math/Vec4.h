@@ -9,7 +9,7 @@
  */
 typedef struct
 {
-  float x, y, z, w;
+    float x, y, z, w;
 } Vec4;
 
 /**
@@ -22,8 +22,8 @@ typedef struct
  */
 static inline Vec3 Homogenize(Vec4 p)
 {
-  // TODO: Implement me (Sheet A04, Assignment 1)
-  return (Vec3) {0, 0, 0};
+    // TODO: Implement me (Sheet A04, Assignment 1)
+    return (Vec3) { 0, 0, 0 };
 }
 
 #endif

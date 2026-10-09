@@ -4,30 +4,31 @@
 listings: true
 listings-disable-line-numbers: false
 numbersections: true
-title: "Praktikum: Mesh 3D Optimierung"
+title: 'Praktikum: Mesh 3D Optimierung'
 titlepage: true
 author: [Prof. Dr.-Ing. Quirin Meyer]
-date: "2025-12-05"
+date: '2025-12-05'
 keywords: [CG1 Praktikum, Optimierung]
 papersize: A4
 fontfamily: roboto
-mainfont: "Roboto-Regular"
-lang: "de"
+mainfont: 'Roboto-Regular'
+lang: 'de'
 header-left: "\\theauthor"
-header-center: " "
-header-right: "Computer Grafik 1"
-footer-left: "Hochschule Coburg"
+header-center: ' '
+header-right: 'Computer Grafik 1'
+footer-left: 'Hochschule Coburg'
 footer-center: "\\thepage"
-footer-right: "FEIF"
+footer-right: 'FEIF'
 ...
 
-**Ziel:** Die Phong-Shading-Implementierung aus `A09PhongShading` soll durch frühzeitiges Aussortieren von Dreiecken und Nutzung einer vorberechneten Bounding Box beschleunigt werden. Als Testmesh dient der Stanford Bunny (`Bunny2k.smm`) mit 2000 Dreiecken.
-Notieren Sie nach jedem Schritt die neue Bildberechnungszeit in ms, die auf der Konsole ausgegeben wird.
+**Ziel:** Die Phong-Shading-Implementierung aus `A09PhongShading` soll durch frühzeitiges Aussortieren von Dreiecken und Nutzung einer vorberechneten
+Bounding Box beschleunigt werden. Als Testmesh dient der Stanford Bunny (`Bunny2k.smm`) mit 2000 Dreiecken. Notieren Sie nach jedem Schritt die neue
+Bildberechnungszeit in ms, die auf der Konsole ausgegeben wird.
 
 # Culling-Funktionen implementieren
 
-Implementieren Sie die Funktionen **`IsBackFace`** und **`IsBoundingBoxAPixel`** in `cgclib/raster/TriangleCull.h`.
-Die Kommentare im Code beschreiben das erwartete Verhalten.
+Implementieren Sie die Funktionen **`IsBackFace`** und **`IsBoundingBoxAPixel`** in `cgclib/raster/TriangleCull.h`. Die Kommentare im Code beschreiben
+das erwartete Verhalten.
 
 **Datei:** `cgclib/raster/TriangleCull.h`
 
@@ -37,7 +38,8 @@ Die Kommentare im Code beschreiben das erwartete Verhalten.
 
 Implementieren Sie die Funktion **`Render3DMeshPhong`** in `A10PhongOptimized/Render3DMeshOptimized.h`.
 
-Nutzen Sie `Render3DMeshPhong` aus `A09PhongShading/Render3DMeshPhongShading.h` als Vorlage und erweitern Sie diese um folgende Optimierungsschritte, **bevor** das Dreieck rasterisiert wird:
+Nutzen Sie `Render3DMeshPhong` aus `A09PhongShading/Render3DMeshPhongShading.h` als Vorlage und erweitern Sie diese um folgende Optimierungsschritte,
+**bevor** das Dreieck rasterisiert wird:
 
 # Degenerierte Dreiecke aussortieren
 
@@ -68,7 +70,8 @@ Rufen Sie **`DrawTriangleZBufferBlinnPhongOptimized`** mit der vorberechneten Bo
 **Datei:** `A10PhongOptimized/Render3DMeshOptimized.h`
 
 # Multiplikationen durch Additionen ersetzen
+
 Ersetzen Sie möglichst viele Multiplikationen durch Additionen (z.B. `EvalLineEquation`, Berechnung von `beta` und `gamma` und `z`)
 
-**Ziel:** Wenn Sie `A10PhongOptimized` ausführen, soll der Stanford Bunny mit Phong-Shading flüssig animiert dargestellt werden - deutlich schneller als die nicht-optimierte Version aus `A09PhongShading`.
-
+**Ziel:** Wenn Sie `A10PhongOptimized` ausführen, soll der Stanford Bunny mit Phong-Shading flüssig animiert dargestellt werden - deutlich schneller
+als die nicht-optimierte Version aus `A09PhongShading`.

@@ -11,7 +11,7 @@
  */
 typedef struct
 {
-  float x, y, z;
+    float x, y, z;
 } Vec3;
 
 /**
@@ -24,7 +24,7 @@ typedef struct
 static inline Vec3 Add(Vec3 a, Vec3 b)
 {
     // TODO: Implement me (Sheet A00, Assignment 1)
-  return (Vec3) {0, 0, 0};
+    return (Vec3) { 0, 0, 0 };
 }
 
 /**
@@ -36,8 +36,8 @@ static inline Vec3 Add(Vec3 a, Vec3 b)
  */
 static inline Vec3 Sub(Vec3 a, Vec3 b)
 {
-  // TODO: Implement me (Sheet A00, Assignment 1)
-  return (Vec3) {0, 0, 0};
+    // TODO: Implement me (Sheet A00, Assignment 1)
+    return (Vec3) { 0, 0, 0 };
 }
 
 /**
@@ -53,8 +53,8 @@ static inline Vec3 Sub(Vec3 a, Vec3 b)
  */
 static inline Vec3 WeightedSum(float beta, float gamma, Vec3 a, Vec3 b, Vec3 c)
 {
-  // TODO: Implement me (Sheet A00, Assignment 1)
-  return (Vec3) {0, 0, 0};
+    // TODO: Implement me (Sheet A00, Assignment 1)
+    return (Vec3) { 0, 0, 0 };
 }
 
 /**
@@ -66,8 +66,8 @@ static inline Vec3 WeightedSum(float beta, float gamma, Vec3 a, Vec3 b, Vec3 c)
  */
 static inline float Dot(Vec3 a, Vec3 b)
 {
-  // TODO: Implement me (Sheet A00, Assignment 1)
-  return 0.0f;
+    // TODO: Implement me (Sheet A00, Assignment 1)
+    return 0.0f;
 }
 
 /**
@@ -79,8 +79,8 @@ static inline float Dot(Vec3 a, Vec3 b)
  */
 static inline Vec3 Scale(float s, Vec3 v)
 {
-  // TODO: Implement me (Sheet A00, Assignment 1)
-  return (Vec3) {0, 0, 0};
+    // TODO: Implement me (Sheet A00, Assignment 1)
+    return (Vec3) { 0, 0, 0 };
 }
 
 /**
@@ -92,8 +92,8 @@ static inline Vec3 Scale(float s, Vec3 v)
  */
 static inline Vec3 Cross(Vec3 a, Vec3 b)
 {
-  // TODO: Implement me (Sheet A00, Assignment 1)
-  return (Vec3) {0, 0, 0};
+    // TODO: Implement me (Sheet A00, Assignment 1)
+    return (Vec3) { 0, 0, 0 };
 }
 
 /**
@@ -104,8 +104,8 @@ static inline Vec3 Cross(Vec3 a, Vec3 b)
  */
 static inline float Length(Vec3 a)
 {
-  // TODO: Implement me (Sheet A00, Assignment 1)
-  return 0.0f;
+    // TODO: Implement me (Sheet A00, Assignment 1)
+    return 0.0f;
 }
 
 /**
@@ -116,8 +116,8 @@ static inline float Length(Vec3 a)
  */
 static inline Vec3 Normalize(Vec3 a)
 {
-  // TODO: Implement me (Sheet A00, Assignment 1)
-  return (Vec3) {0, 0, 0};
+    // TODO: Implement me (Sheet A00, Assignment 1)
+    return (Vec3) { 0, 0, 0 };
 }
 
 #endif

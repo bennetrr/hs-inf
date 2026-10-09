@@ -1,9 +1,9 @@
 #ifndef MAT4_H
 #define MAT4_H
 #define _USE_MATH_DEFINES
-#include <math.h>
 #include <cgclib/math/Vec3.h>
 #include <cgclib/math/Vec4.h>
+#include <math.h>
 
 /**
  * @brief Represents a 4x4 matrix using a flat array of 16 floats.
@@ -14,7 +14,7 @@
  */
 typedef struct
 {
-  float m[16];
+    float m[16];
 } Mat4;
 
 /**
@@ -33,9 +33,9 @@ typedef struct
  */
 static inline Mat4 SetIdentity()
 {
-  Mat4 r = {0};
-  // TODO: Implement me (Sheet A03, Assignment 1)
-  return r;
+    Mat4 r = { 0 };
+    // TODO: Implement me (Sheet A03, Assignment 1)
+    return r;
 }
 
 /**
@@ -46,9 +46,9 @@ static inline Mat4 SetIdentity()
  */
 static inline Mat4 SetRotateZ(float angle)
 {
-  Mat4 r = {0};
-  // TODO: Implement me (Sheet A03, Assignment 1)
-  return r;
+    Mat4 r = { 0 };
+    // TODO: Implement me (Sheet A03, Assignment 1)
+    return r;
 }
 
 /**
@@ -59,9 +59,9 @@ static inline Mat4 SetRotateZ(float angle)
  */
 static inline Mat4 SetRotateX(float angle)
 {
-  Mat4 r = {0};
-  // TODO: Implement me (Sheet A03, Assignment 1)
-  return r;
+    Mat4 r = { 0 };
+    // TODO: Implement me (Sheet A03, Assignment 1)
+    return r;
 }
 
 /**
@@ -72,9 +72,9 @@ static inline Mat4 SetRotateX(float angle)
  */
 static inline Mat4 SetRotateY(float angle)
 {
-  Mat4 r = {0};
-// TODO: Implement me (Sheet A03, Assignment 1)
-  return r;
+    Mat4 r = { 0 };
+    // TODO: Implement me (Sheet A03, Assignment 1)
+    return r;
 }
 
 /**
@@ -87,9 +87,9 @@ static inline Mat4 SetRotateY(float angle)
  */
 static inline Mat4 SetTranslate(float tx, float ty, float tz)
 {
-  Mat4 r = {0};
-  // TODO: Implement me (Sheet A03, Assignment 1)
-  return r;
+    Mat4 r = { 0 };
+    // TODO: Implement me (Sheet A03, Assignment 1)
+    return r;
 }
 
 /**
@@ -102,9 +102,9 @@ static inline Mat4 SetTranslate(float tx, float ty, float tz)
  */
 static inline Mat4 SetScale(float sx, float sy, float sz)
 {
-  Mat4 r = {0};
-  // TODO: Implement me (Sheet A03, Assignment 1)
-  return r;
+    Mat4 r = { 0 };
+    // TODO: Implement me (Sheet A03, Assignment 1)
+    return r;
 }
 
 /**
@@ -116,9 +116,9 @@ static inline Mat4 SetScale(float sx, float sy, float sz)
  */
 static inline Mat4 Mat4xMat4(Mat4 a, Mat4 b)
 {
-  Mat4 result = {0};
-  // TODO: Implement me (Sheet A03, Assignment 1)
-  return result;
+    Mat4 result = { 0 };
+    // TODO: Implement me (Sheet A03, Assignment 1)
+    return result;
 }
 
 /**
@@ -130,9 +130,9 @@ static inline Mat4 Mat4xMat4(Mat4 a, Mat4 b)
  */
 static inline Vec3 Mat4xVec3Affine(Mat4 a, Vec3 b)
 {
-  Vec3 result = {0};
-  // TODO: Implement me (Sheet A03, Assignment 1)
-  return result;
+    Vec3 result = { 0 };
+    // TODO: Implement me (Sheet A03, Assignment 1)
+    return result;
 }
 
 /**
@@ -145,9 +145,9 @@ static inline Vec3 Mat4xVec3Affine(Mat4 a, Vec3 b)
  */
 static inline Vec4 Mat4xVec3(Mat4 a, Vec3 b)
 {
-  Vec4 result = {0};
-  // TODO: Implement me (Sheet A03, Assignment 1)
-  return result;
+    Vec4 result = { 0 };
+    // TODO: Implement me (Sheet A03, Assignment 1)
+    return result;
 }
 
 /**
@@ -159,9 +159,9 @@ static inline Vec4 Mat4xVec3(Mat4 a, Vec3 b)
  */
 static inline Vec3 Mat3xVec3(Mat4 a, Vec3 b)
 {
-  Vec3 result = {0};
-  // TODO: Implement me (Sheet A03, Assignment 1)
-  return result;
+    Vec3 result = { 0 };
+    // TODO: Implement me (Sheet A03, Assignment 1)
+    return result;
 }
 
 #endif

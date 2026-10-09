@@ -15,11 +15,11 @@
  */
 static inline Mat4 NDCToWindow(uint32_t width, uint32_t height)
 {
-  assert(width > 0);
-  assert(height > 0);
-  // TODO: Implement me (Sheet A03, Assignment 2)
-  Mat4 result = {0};
-  return result;
+    assert(width > 0);
+    assert(height > 0);
+    // TODO: Implement me (Sheet A03, Assignment 2)
+    Mat4 result = { 0 };
+    return result;
 }
 
 /**
@@ -34,11 +34,11 @@ static inline Mat4 NDCToWindow(uint32_t width, uint32_t height)
  */
 static inline Mat4 Projection2D(uint32_t width, uint32_t height)
 {
-  assert(width > 0);
-  assert(height > 0);
-  // TODO: Implement me (Sheet A03, Assignment 2)
-  Mat4 result = {0};
-  return result;
+    assert(width > 0);
+    assert(height > 0);
+    // TODO: Implement me (Sheet A03, Assignment 2)
+    Mat4 result = { 0 };
+    return result;
 }
 
 /**
@@ -57,17 +57,17 @@ static inline Mat4 Projection2D(uint32_t width, uint32_t height)
 static inline Mat4 Projection3D(uint32_t width, uint32_t height, float fieldOfViewYRadians, float n, float f)
 {
 
-  assert(n < 0);
-  assert(f < 0);
-  assert(width > 0);
-  assert(height > 0);
-  assert(fieldOfViewYRadians > 0.0f);
-  assert(fieldOfViewYRadians < M_PI);
-  assert(n - f > 0.0);
-  assert(f < n);
-  // TODO: Implement me (Sheet A04, Assignment 2)
-  Mat4 result = {0};
-  return result;
+    assert(n < 0);
+    assert(f < 0);
+    assert(width > 0);
+    assert(height > 0);
+    assert(fieldOfViewYRadians > 0.0f);
+    assert(fieldOfViewYRadians < M_PI);
+    assert(n - f > 0.0);
+    assert(f < n);
+    // TODO: Implement me (Sheet A04, Assignment 2)
+    Mat4 result = { 0 };
+    return result;
 }
 
 #endif

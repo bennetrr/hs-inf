@@ -1,9 +1,9 @@
 #ifndef LINE_EQUATION_H
 #define LINE_EQUATION_H
 #include <assert.h>
+#include <cgclib/math/FixedPoint.h>
 #include <math.h>
 #include <stdint.h>
-#include <cgclib/math/FixedPoint.h>
 
 /**
  * @brief Represents a 2D line equation in normal form.
@@ -13,10 +13,10 @@
  */
 typedef struct LineEquation
 {
-  fixed_t nx;
-  fixed_t ny;
-  fixed_t d;
-  float   invLength;
+    fixed_t nx;
+    fixed_t ny;
+    fixed_t d;
+    float   invLength;
 } LineEquation;
 
 /**
@@ -32,9 +32,9 @@ typedef struct LineEquation
  */
 static inline LineEquation CreateLineEquation(fixed_t ax, fixed_t ay, fixed_t bx, fixed_t by)
 {
-  LineEquation result  = {0};
-  // TODO: Implement me (Sheet A02, Assignment 2)
-  return result;
+    LineEquation result = { 0 };
+    // TODO: Implement me (Sheet A02, Assignment 2)
+    return result;
 }
 
 /**
@@ -49,8 +49,8 @@ static inline LineEquation CreateLineEquation(fixed_t ax, fixed_t ay, fixed_t bx
  */
 static inline int32_t EvalLineEquation(LineEquation lineEquation, fixed_t x, fixed_t y)
 {
-  // TODO: Implement me (Sheet A02, Assignment 2)
-  return 0;
+    // TODO: Implement me (Sheet A02, Assignment 2)
+    return 0;
 }
 
 /**
@@ -65,8 +65,8 @@ static inline int32_t EvalLineEquation(LineEquation lineEquation, fixed_t x, fix
  */
 static inline float DistanceToLine(LineEquation lineEquation, fixed_t x, fixed_t y)
 {
-  // TODO: Implement me (Sheet A02, Assignment 2)
-  return 0.0f;
+    // TODO: Implement me (Sheet A02, Assignment 2)
+    return 0.0f;
 }
 
 #endif

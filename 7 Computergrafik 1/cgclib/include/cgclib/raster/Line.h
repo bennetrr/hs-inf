@@ -1,7 +1,7 @@
 #ifndef LINE_H
 #define LINE_H
-#include <stdint.h>
 #include <cgclib/sys/PixelBuffer.h>
+#include <stdint.h>
 
 /**
  * @brief Draws a line on a pixel buffer using an efficient integer-based algorithm.

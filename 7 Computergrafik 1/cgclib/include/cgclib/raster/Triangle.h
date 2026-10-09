@@ -176,19 +176,24 @@ void DrawTriangleZBufferBlinnPhongOptimized(PixelBuffer p, BoundingBox b, fixed_
 
 #ifdef WIN32
 #include <intrin.h>
-typedef union { float f; long l; } ZBits;
+typedef union
+{
+    float f;
+    long  l;
+} ZBits;
 static inline bool ZTestAndSet(float* zBuf, int32_t ofs, float z)
 {
-  ZBits desired  = {z};
-  ZBits expected = {zBuf[ofs]};
-  while (expected.f > z)
-  {
-    ZBits prev;
-    prev.l = _InterlockedCompareExchange((volatile long*)(zBuf + ofs), desired.l, expected.l);
-    if (prev.l == expected.l) return true;
-    expected.l = prev.l;
-  }
-  return false;
+    ZBits desired  = { z };
+    ZBits expected = { zBuf[ofs] };
+    while (expected.f > z)
+    {
+        ZBits prev;
+        prev.l = _InterlockedCompareExchange((volatile long*)(zBuf + ofs), desired.l, expected.l);
+        if (prev.l == expected.l)
+            return true;
+        expected.l = prev.l;
+    }
+    return false;
 }
 #endif
 

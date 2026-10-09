@@ -4,29 +4,30 @@
 listings: true
 listings-disable-line-numbers: false
 numbersections: true
-title: "Praktikum: Gouraud-Shading"
+title: 'Praktikum: Gouraud-Shading'
 titlepage: true
 author: [Prof. Dr.-Ing. Quirin Meyer]
-date: "2026-01-12"
+date: '2026-01-12'
 keywords: [CG1 Praktikum, Gouraud, Shading]
 papersize: A4
 fontfamily: roboto
-mainfont: "Roboto-Regular"
-lang: "de"
+mainfont: 'Roboto-Regular'
+lang: 'de'
 header-left: "\\theauthor"
-header-center: " "
-header-right: "Computer Grafik 1"
-footer-left: "Hochschule Coburg"
+header-center: ' '
+header-right: 'Computer Grafik 1'
+footer-left: 'Hochschule Coburg'
 footer-center: "\\thepage"
-footer-right: "FEIF"
+footer-right: 'FEIF'
 ...
 
-**Ziel:** Ein 3D-Mesh soll mit Gouraud-Shading gerendert werden. Dabei wird die Beleuchtung pro Vertex berechnet und die resultierenden Farben über das Dreieck interpoliert.
+**Ziel:** Ein 3D-Mesh soll mit Gouraud-Shading gerendert werden. Dabei wird die Beleuchtung pro Vertex berechnet und die resultierenden Farben über
+das Dreieck interpoliert.
 
 # Beleuchtungsmethoden
 
-Die Funktionen `DiffuseLighting` und `BlinnLighting` wurden bereits in **Praktikum A07** implementiert.
-Stellen Sie sicher, dass alle Tests in `T17TestLighting` erfolgreich durchlaufen.
+Die Funktionen `DiffuseLighting` und `BlinnLighting` wurden bereits in **Praktikum A07** implementiert. Stellen Sie sicher, dass alle Tests in
+`T17TestLighting` erfolgreich durchlaufen.
 
 **Dateien:** `cgclib/math/Lighting.h`, `cgclib/src/math/Lighting.c`
 

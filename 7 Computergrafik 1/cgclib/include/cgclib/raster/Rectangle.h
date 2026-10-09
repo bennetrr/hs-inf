@@ -1,7 +1,7 @@
 #ifndef RECTANGLE_H
 #define RECTANGLE_H
-#include <stdint.h>
 #include <cgclib/sys/PixelBuffer.h>
+#include <stdint.h>
 
 /**
  * @brief Draws a filled rectangle onto a pixel buffer.

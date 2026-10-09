@@ -12,10 +12,10 @@
  */
 typedef struct
 {
-  int32_t x0;
-  int32_t y0;
-  int32_t x1;
-  int32_t y1;
+    int32_t x0;
+    int32_t y0;
+    int32_t x1;
+    int32_t y1;
 } BoundingBox;
 
 /**
@@ -37,9 +37,9 @@ typedef struct
 static inline BoundingBox ComputeClippedBoundBox(int32_t w, int32_t h, fixed_t ax, fixed_t ay, fixed_t bx, fixed_t by,
                                                  fixed_t cx, fixed_t cy)
 {
-  BoundingBox r = {0};
-  // TODO: Implement me (Sheet A02, Assignment 4)
-  return r;
+    BoundingBox r = { 0 };
+    // TODO: Implement me (Sheet A02, Assignment 4)
+    return r;
 }
 
 /**
@@ -59,13 +59,12 @@ static inline BoundingBox ComputeClippedBoundBox(int32_t w, int32_t h, fixed_t a
  * @return BoundingBox The clipped bounding box (screen coordinates).
  */
 static inline BoundingBox ComputeClippedBoundBoxFloat(int32_t w, int32_t h, float ax, float ay, float bx, float by,
-                                                 float cx, float cy)
+                                                      float cx, float cy)
 {
-  BoundingBox r = {0};
-  // TODO: Implement me (Sheet B02, Assignment 4)
-  return r;
+    BoundingBox r = { 0 };
+    // TODO: Implement me (Sheet B02, Assignment 4)
+    return r;
 }
-
 
 /**
  * @brief Checks if the bounding box has zero area.
@@ -76,7 +75,7 @@ static inline BoundingBox ComputeClippedBoundBoxFloat(int32_t w, int32_t h, floa
  */
 static inline bool IsBoundingBoxZero(const BoundingBox b)
 {
-  return false;
+    return false;
 }
 
 /**
@@ -95,8 +94,8 @@ static inline bool IsBoundingBoxZero(const BoundingBox b)
  */
 static inline bool IsBackFace(fixed_t ax, fixed_t ay, fixed_t bx, fixed_t by, fixed_t cx, fixed_t cy)
 {
-  // TODO: Implement me (Sheet A10, Assignment 1)
-  return false;
+    // TODO: Implement me (Sheet A10, Assignment 1)
+    return false;
 }
 
 /**
@@ -108,8 +107,8 @@ static inline bool IsBackFace(fixed_t ax, fixed_t ay, fixed_t bx, fixed_t by, fi
  */
 static inline bool IsBoundingBoxAPixel(const BoundingBox b)
 {
-  // TODO: Implement me (Sheet A10, Assignment 1)
-  return false;
+    // TODO: Implement me (Sheet A10, Assignment 1)
+    return false;
 }
 
 /**
@@ -126,8 +125,8 @@ static inline bool IsBoundingBoxAPixel(const BoundingBox b)
  */
 static inline bool IsDegenerate(fixed_t ax, fixed_t ay, fixed_t bx, fixed_t by, fixed_t cx, fixed_t cy)
 {
-  // TODO: Implement me (Sheet A02, Assignment 3)
-  return false;
+    // TODO: Implement me (Sheet A02, Assignment 3)
+    return false;
 }
 
 #endif

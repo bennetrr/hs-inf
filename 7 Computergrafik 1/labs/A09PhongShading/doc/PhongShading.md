@@ -4,24 +4,25 @@
 listings: true
 listings-disable-line-numbers: false
 numbersections: true
-title: "Praktikum: Phong-Shading"
+title: 'Praktikum: Phong-Shading'
 titlepage: true
 author: [Prof. Dr.-Ing. Quirin Meyer]
-date: "2026-01-19"
+date: '2026-01-19'
 keywords: [CG1 Praktikum, Phong, Shading]
 papersize: A4
 fontfamily: roboto
-mainfont: "Roboto-Regular"
-lang: "de"
+mainfont: 'Roboto-Regular'
+lang: 'de'
 header-left: "\\theauthor"
-header-center: " "
-header-right: "Computer Grafik 1"
-footer-left: "Hochschule Coburg"
+header-center: ' '
+header-right: 'Computer Grafik 1'
+footer-left: 'Hochschule Coburg'
 footer-center: "\\thepage"
-footer-right: "FEIF"
+footer-right: 'FEIF'
 ...
 
-**Ziel:** Ein 3D-Mesh soll mit Phong-Shading gerendert werden. Im Gegensatz zu Gouraud-Shading wird die Beleuchtung nicht pro Vertex, sondern **pro Pixel** berechnet. Dazu werden Normalen und Positionen über das Dreieck interpoliert und die Beleuchtungsberechnung im Fragment-Shader durchgeführt.
+**Ziel:** Ein 3D-Mesh soll mit Phong-Shading gerendert werden. Im Gegensatz zu Gouraud-Shading wird die Beleuchtung nicht pro Vertex, sondern **pro
+Pixel** berechnet. Dazu werden Normalen und Positionen über das Dreieck interpoliert und die Beleuchtungsberechnung im Fragment-Shader durchgeführt.
 
 # `Render3DMeshPhong` implementieren
 
@@ -29,7 +30,9 @@ Implementieren Sie die Funktion **`Render3DMeshPhong`** in `A09PhongShading/Rend
 
 Nutzen Sie `Render3DMeshGouraud` aus `A08GouraudShading/Render3DMeshGouraudShading.h` als Vorlage.
 
-**Unterschied zu Gouraud-Shading:** Anstatt die Beleuchtung pro Vertex zu berechnen und die Farben zu interpolieren, werden die **Normalen** und **View-Space-Positionen** pro Vertex an `DrawTriangleZBufferBlinnPhong` übergeben. Die Beleuchtungsberechnung erfolgt dann pro Pixel innerhalb der Rasterisierungsfunktion.
+**Unterschied zu Gouraud-Shading:** Anstatt die Beleuchtung pro Vertex zu berechnen und die Farben zu interpolieren, werden die **Normalen** und
+**View-Space-Positionen** pro Vertex an `DrawTriangleZBufferBlinnPhong` übergeben. Die Beleuchtungsberechnung erfolgt dann pro Pixel innerhalb der
+Rasterisierungsfunktion.
 
 **Vorgehen:**
 

@@ -16,9 +16,9 @@ typedef int32_t (*RenderSceneCallback)(PixelBuffer pixelBuffer);
  */
 typedef struct CGWindow
 {
-  PixelBuffer          pixelBuffer;          /**< The pixel buffer used for rendering */
-  RenderSceneCallback  renderSceneCallback;  /**< Callback function for rendering the scene */
-  void*                context;              /**< Windows-specific rendering context */  
+    PixelBuffer         pixelBuffer;         /**< The pixel buffer used for rendering */
+    RenderSceneCallback renderSceneCallback; /**< Callback function for rendering the scene */
+    void*               context;             /**< Windows-specific rendering context */
 } CGWindow;
 
 /**

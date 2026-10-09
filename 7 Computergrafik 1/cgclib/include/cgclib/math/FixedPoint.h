@@ -20,8 +20,8 @@ typedef int32_t fixed_t;
  */
 enum
 {
-  fixed_one      = 1 << FRAC_BITS,      // 1.0 in fixed-point
-  fixed_one_half = 1 << (FRAC_BITS - 1) // 0.5 in fixed-point
+    fixed_one      = 1 << FRAC_BITS,      // 1.0 in fixed-point
+    fixed_one_half = 1 << (FRAC_BITS - 1) // 0.5 in fixed-point
 };
 
 /**
@@ -32,8 +32,8 @@ enum
  */
 static inline float FixedToFloat(fixed_t fixed)
 {
-  // TODO: Implement me (Sheet A02, Assignment 1)
-  return 0.0f;
+    // TODO: Implement me (Sheet A02, Assignment 1)
+    return 0.0f;
 }
 
 /**
@@ -44,8 +44,8 @@ static inline float FixedToFloat(fixed_t fixed)
  */
 static inline fixed_t FloatToFixed(float fl)
 {
-  // TODO: Implement me (Sheet A02, Assignment 1)
-  return 0;
+    // TODO: Implement me (Sheet A02, Assignment 1)
+    return 0;
 }
 
 /**
@@ -56,8 +56,8 @@ static inline fixed_t FloatToFixed(float fl)
  */
 static inline fixed_t IntToFixed(int32_t i)
 {
-  // TODO: Implement me (Sheet A02, Assignment 1)
-  return 0;
+    // TODO: Implement me (Sheet A02, Assignment 1)
+    return 0;
 }
 
 /**
@@ -68,8 +68,8 @@ static inline fixed_t IntToFixed(int32_t i)
  */
 static inline int32_t FixedToInt(fixed_t fixed)
 {
-  // TODO: Implement me (Sheet A02, Assignment 1)
-  return 0;
+    // TODO: Implement me (Sheet A02, Assignment 1)
+    return 0;
 }
 
 /**
@@ -80,9 +80,8 @@ static inline int32_t FixedToInt(fixed_t fixed)
  */
 static inline int32_t FixedToIntFloor(fixed_t fixed)
 {
-  // TODO: Implement me (Sheet A02, Assignment 1)
-  return 0;
+    // TODO: Implement me (Sheet A02, Assignment 1)
+    return 0;
 }
-
 
 #endif

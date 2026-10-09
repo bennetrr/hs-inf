@@ -6,12 +6,12 @@
  * @brief Computes per-vertex normals for a 3D mesh.
  *
  * This function calculates normals for each vertex in a mesh based on the
- * positions of the vertices and the triangle indices. 
+ * positions of the vertices and the triangle indices.
  *
  * @param normals      Output array of size numVertices.
  *                     Each entry will be filled with the computed normal vector
- *                     for the corresponding vertex. It is in the callers 
- *					   responsibility to make sure that at least numVertices 
+ *                     for the corresponding vertex. It is in the callers
+ *					   responsibility to make sure that at least numVertices
  *					   normals can be stored in this array.
  *
  * @param positions    Input array of size numVertices.

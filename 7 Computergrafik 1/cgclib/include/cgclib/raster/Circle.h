@@ -1,7 +1,7 @@
 #ifndef ELLIPSIS_H
 #define ELLIPSIS_H
-#include <stdint.h>
 #include <cgclib/sys/PixelBuffer.h>
+#include <stdint.h>
 
 /**
  * @brief Draws a filled circle onto a pixel buffer.

@@ -4,17 +4,16 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-
 /**
  * @brief Represents a pixel buffer used for rendering, including color and depth information.
  */
 typedef struct PixelBuffer
 {
-  uint32_t* pixels;
-  float*    zBuffer;
-  int32_t   width;
-  int32_t   height;
-  float     time;
+    uint32_t* pixels;
+    float*    zBuffer;
+    int32_t   width;
+    int32_t   height;
+    float     time;
 } PixelBuffer;
 
 /**
@@ -29,7 +28,7 @@ typedef struct PixelBuffer
  */
 static inline uint32_t Color(uint32_t r, uint32_t g, uint32_t b)
 {
-  return 0xff000000 | ((MIN((r), 255)) << 16) | ((MIN((g), 255)) << 8) | (MIN((b), 255));
+    return 0xff000000 | ((MIN((r), 255)) << 16) | ((MIN((g), 255)) << 8) | (MIN((b), 255));
 }
 
 /**
@@ -45,7 +44,7 @@ static inline uint32_t Color(uint32_t r, uint32_t g, uint32_t b)
  */
 static inline int32_t ComputePixelOffset(PixelBuffer p, int32_t x, int32_t y)
 {
-  return y * p.width + x;
+    return y * p.width + x;
 }
 
 /**
@@ -61,7 +60,7 @@ static inline int32_t ComputePixelOffset(PixelBuffer p, int32_t x, int32_t y)
  */
 static inline void SetPixelBufferPixel(PixelBuffer p, int32_t x, int32_t y, uint32_t color)
 {
-  p.pixels[ComputePixelOffset(p, x, y)] = color;
+    p.pixels[ComputePixelOffset(p, x, y)] = color;
 }
 
 /**
@@ -77,7 +76,7 @@ static inline void SetPixelBufferPixel(PixelBuffer p, int32_t x, int32_t y, uint
  */
 static inline uint32_t GetPixelBufferPixel(PixelBuffer p, int32_t x, int32_t y)
 {
-  return p.pixels[ComputePixelOffset(p, x, y)];
+    return p.pixels[ComputePixelOffset(p, x, y)];
 }
 
 /**
@@ -88,7 +87,7 @@ static inline uint32_t GetPixelBufferPixel(PixelBuffer p, int32_t x, int32_t y)
  */
 static inline uint32_t ToColorComponent(float y)
 {
-  return (uint32_t)(y * 255.0f + 0.5f);
+    return (uint32_t)(y * 255.0f + 0.5f);
 }
 
 /**
@@ -139,18 +138,16 @@ void SetZBufferToZero(PixelBuffer p);
  *
  * @param p PixelBuffer whose color buffer should be written.
  * @param filename const char* Filename of the image
- * 
+ *
  * @return 0 on failure, non-zero on success.
  */
 int SavePixelBufferToFile(PixelBuffer p, const char* filename);
 
-
-
 typedef struct
 {
-  bool WidthMismatch;
-  bool HeightMismatch;
-  bool PixelMismatch;
+    bool WidthMismatch;
+    bool HeightMismatch;
+    bool PixelMismatch;
 } ComparePixelBufferResult;
 
 /**
@@ -158,7 +155,7 @@ typedef struct
  *
  * This function compares the contents of a given PixelBuffer p to a reference image
  * specified by referenceFileName. It saves the PixelBuffer to a file
- * (pixelBufferFileName) and generates a diff image (diffImageFileName) 
+ * (pixelBufferFileName) and generates a diff image (diffImageFileName)
  * It reports mismatches in width, height, and pixel data.
  *
  * @param p The PixelBuffer to compare.
@@ -169,11 +166,8 @@ typedef struct
  * @param createReference True, if you want to create the reference
  * @return 0 on error.
  */
-int ComparePixelBufferToFile(PixelBuffer p, 
-	const char* referenceFileName, 
-	const char* pixelBufferFileName,                              
-	const char* diffImageFileName, ComparePixelBufferResult* mismatchResult,
-	bool createReference);
-	
+int ComparePixelBufferToFile(PixelBuffer p, const char* referenceFileName, const char* pixelBufferFileName,
+                             const char* diffImageFileName, ComparePixelBufferResult* mismatchResult,
+                             bool createReference);
 
 #endif
