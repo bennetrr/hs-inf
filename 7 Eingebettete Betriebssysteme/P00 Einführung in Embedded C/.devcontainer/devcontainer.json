@@ -6,10 +6,11 @@
   "postCreateCommand": "sudo apt-get update && sudo apt-get install -y --no-install-recommends make gcc-arm-none-eabi libnewlib-arm-none-eabi qemu-system-arm gdb-multiarch && make",
   "customizations": {
     "vscode": {
-      "extensions": [
-        "marus25.cortex-debug",
-        "ms-vscode.cpptools"
-      ]
+      "extensions": ["marus25.cortex-debug", "ms-vscode.cpptools"]
     }
+  },
+  "containerEnv": {
+    "LANG": "C.UTF-8",
+    "LC_ALL": "C.UTF-8"
   }
 }

@@ -1,29 +1,33 @@
 /* 0.3.7 Praeprozessor und Makros (Vorlesung 2.8) */
-#include <stdio.h>
 #include "aufgaben.h"
+#include <stdio.h>
 
 /* a) Praeprozessor als Taschenrechner */
 #define SECONDS_PER_YEAR   (60UL * 60UL * 24UL * 365UL)
-#define SECONDS_PER_YEAR16 ((uint16_t)(60 * 60 * 24 * 365))   /* Was passiert hier? */
+#define SECONDS_PER_YEAR16 ((uint16_t)(60 * 60 * 24 * 365)) /* Was passiert hier? */
 
 /* b) problematische Makros (Folie 2-53) */
-#define Calculation(A,B)   A = B * B + B
-#define Calc(A,B)          {A=A+1; B=B+2;}
-#define MIN(A,B)           ((A) <= (B) ? (A) : (B))
+#define Calculation(A, B) A = B * B + B
+#define Calc(A, B)                                                                                                     \
+    {                                                                                                                  \
+        A = A + 1;                                                                                                     \
+        B = B + 2;                                                                                                     \
+    }
+#define MIN(A, B) ((A) <= (B) ? (A) : (B))
 
 /* c) Stringification und Concatenation (Folie 2-56/2-57) */
-#define WARNING(EXP)       sprintf(meldung, "Warning: " #EXP)
+#define WARNING(EXP) sprintf(meldung, "Warning: " #EXP)
 
-static volatile uint32_t PORTA;      /* simulierter Port */
-#define Button_bit   1
-#define Button_port  PORTA
-#define SetPin(pin, value) \
-        { \
-        if ( value ) \
-            pin ## _port |= 1 << pin ## _bit; \
-        else \
-            pin ## _port &= ~(1 << pin ## _bit); \
-        }
+static volatile uint32_t PORTA; /* simulierter Port */
+#define Button_bit  1
+#define Button_port PORTA
+#define SetPin(pin, value)                                                                                             \
+    {                                                                                                                  \
+        if (value)                                                                                                     \
+            pin##_port |= 1 << pin##_bit;                                                                              \
+        else                                                                                                           \
+            pin##_port &= ~(1 << pin##_bit);                                                                           \
+    }
 
 /* d) bedingte Uebersetzung */
 #define PFERD 4711
@@ -43,11 +47,11 @@ void Praeprozessor(void)
 
     /* b) */
     unsigned long int a = 3, b = 3;
-    Calculation(a, b);       // a = ?
+    Calculation(a, b); // a = ?
     unsigned long int r1 = a;
-    Calculation(a, b+2);     // a = ?
+    Calculation(a, b + 2); // a = ?
     unsigned long int r2 = a;
-    Calculation(a, ++b);     // a = ?  b = ?
+    Calculation(a, ++b); // a = ?  b = ?
     unsigned long int r3 = a;
 
     int x = 3, y = 3, i = 1;
@@ -59,7 +63,7 @@ void Praeprozessor(void)
 #endif
 
     int k = 2, m = 5;
-    int kleinste = MIN(k++, m);   // kleinste = ?  k = ?
+    int kleinste = MIN(k++, m); // kleinste = ?  k = ?
 
     /* c) */
     char meldung[32];
@@ -78,7 +82,16 @@ void Praeprozessor(void)
     pferd = 2;
 #endif
 
-    (void)sek_jahr; (void)sek_jahr16; (void)r1; (void)r2; (void)r3;
-    (void)x; (void)y; (void)i; (void)kleinste; (void)porta1; (void)porta2;
+    (void)sek_jahr;
+    (void)sek_jahr16;
+    (void)r1;
+    (void)r2;
+    (void)r3;
+    (void)x;
+    (void)y;
+    (void)i;
+    (void)kleinste;
+    (void)porta1;
+    (void)porta2;
     (void)pferd;
 }
