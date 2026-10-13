@@ -1,0 +1,15 @@
+{
+  // Entwicklungsumgebung fuer EBSy P0: GNU Arm Toolchain + QEMU + GDB
+  // Laeuft in GitHub Codespaces (im Browser) oder lokal mit Docker.
+  "name": "EBSy P0 - ARM GCC + QEMU",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu-24.04",
+  "postCreateCommand": "sudo apt-get update && sudo apt-get install -y --no-install-recommends make gcc-arm-none-eabi libnewlib-arm-none-eabi qemu-system-arm gdb-multiarch && make",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "marus25.cortex-debug",
+        "ms-vscode.cpptools"
+      ]
+    }
+  }
+}
