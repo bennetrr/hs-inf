@@ -19,7 +19,13 @@ CPUFLAGS = -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16
 CFLAGS   = $(CPUFLAGS) -std=c99 -O0 -g3 -Wall -Wextra -ffunction-sections -fdata-sections
 ASFLAGS  = $(CPUFLAGS) -g
 LDFLAGS  = $(CPUFLAGS) -T stm32f405_qemu.ld -Wl,-Map=$(TARGET).map -Wl,--gc-sections \
-           --specs=nano.specs --specs=nosys.specs -Wl,--no-warn-rwx-segments
+           --specs=nano.specs --specs=nosys.specs
+
+# Ab binutils 2.39 warnt ld vor RWX-Segmenten (bei Mikrocontrollern harmlos).
+# Aeltere Linker kennen die Option nicht, deshalb nur setzen, wenn ld sie unterstuetzt.
+ifneq ($(shell $(PREFIX)ld --help 2>/dev/null | grep -c no-warn-rwx-segments),0)
+LDFLAGS += -Wl,--no-warn-rwx-segments
+endif
 
 # Diese Datei wird absichtlich mit Optimierung uebersetzt (Aufgabe volatile)
 OPT_O2   = $(BUILD)/p0_volatile.o

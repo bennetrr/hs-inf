@@ -5,7 +5,8 @@ files from there.
 
 ## 0. Dev container
 
-Add the locale variables to `.devcontainer/devcontainer.json` so the tools in the container run with UTF-8 (e.g. for umlauts in paths), then rebuild the container:
+Add the locale variables to `.devcontainer/devcontainer.json` so the tools in the container run with UTF-8 (e.g. for umlauts in paths), then rebuild
+the container:
 
 ```jsonc
 "containerEnv": {
@@ -70,7 +71,7 @@ line in `postCreateCommand` if you want it to survive.
 
 ## 5. Clean up old files
 
-Remove the old Makefile tasks from CLion, and remove the VS Code configuration files. 
+Remove the old Makefile tasks from CLion, and remove the VS Code configuration files.
 
 ## 6. Format the code
 

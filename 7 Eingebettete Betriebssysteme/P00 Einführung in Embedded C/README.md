@@ -6,16 +6,22 @@
 - Compiler: GNU Arm Embedded Toolchain (`arm-none-eabi-gcc`)
 - Debugger: GDB (`gdb-multiarch`) mit der VS-Code-Erweiterung Cortex-Debug
 
-## Start im Browser (GitHub Codespaces, keine Installation)
+## Projekt herunterladen
 
-1. Repository auf GitHub öffnen → **Code** → **Codespaces** → **Create codespace**.
-2. Warten, bis die Umgebung eingerichtet ist (beim ersten Start einige Minuten, das Projekt wird dabei automatisch einmal übersetzt).
-3. Links **Run and Debug** (Strg+Umschalt+D) → „P0 debuggen (ab main)“ → **F5**.
+Oben rechts **Code → Download source code → zip** wählen und das Zip auf dem eigenen Rechner entpacken.
 
-## Lokal (optional)
+## Installation
 
-- Mit Docker: VS Code + Erweiterung „Dev Containers“ → „Reopen in Container“.
-- Ohne Docker (Linux/WSL): `sudo apt install make gcc-arm-none-eabi libnewlib-arm-none-eabi qemu-system-arm gdb-multiarch`
+Siehe Anleitung „P0 – Lokale Installation unter Windows (und Linux)“ in Moodle:
+
+- **Weg A (empfohlen):** WSL + Ubuntu, Werkzeuge mit `apt`, Debuggen mit **Seer**.
+- **Weg B:** WSL + Ubuntu, Werkzeuge mit `apt`, Debuggen mit **VS Code** (`code .`, dann F5 → „P0 debuggen (ab main)“).
+- **Weg C:** Docker Desktop + VS Code „Dev Containers“ → „Reopen in Container“.
+- **Bereits Linux (nativ oder VM):** `sudo apt install make gcc-arm-none-eabi libnewlib-arm-none-eabi qemu-system-arm gdb-multiarch`, dann wie Weg A
+  oder B.
+
+Das Makefile funktioniert auch mit älteren Toolchains (getestet: GCC 9.2 / binutils 2.34 und GCC 13.2 / binutils 2.42). Adressen im Speicher können
+sich zwischen Compilerversionen leicht unterscheiden.
 
 ## Befehle
 
