@@ -33,13 +33,12 @@ void Operatoren(void)
     op2 = op1 << 1;
     op2 = op1 >> 1;
 
-    /* Programmieraufgabe (Folie 2-22): Ersetzen Sie jeweils die 0
-     * durch einen Ausdruck mit Schiebe- und Bitoperatoren.          */
-    REG |= 0;                       // TODO: Bit 5 setzen
-    REG &= ~0;                      // TODO: Bit 0 loeschen
-    REG ^= 0;                       // TODO: Bit 12 und Bit 13 invertieren
-    uint32_t bit3 = 0;              // TODO: 1, wenn Bit 3 gesetzt ist, sonst 0
-    REG           = (REG & ~0) | 0; // TODO: Bits 8..11 auf den Wert 0x5 setzen
+    // Programmieraufgabe (Folie 2-22): Ersetzen Sie jeweils die 0 durch einen Ausdruck mit Schiebe- und Bitoperatoren.
+    REG |= 0b1 << 5;                                  // Bit 5 setzen
+    REG &= ~(0b1 << 0);                               // Bit 0 loeschen
+    REG ^= 0b11 << 12;                                // Bit 12 und Bit 13 invertieren
+    uint32_t bit3 = (REG & (0b1 << 3)) >> 3;          // 1, wenn Bit 3 gesetzt ist, sonst 0
+    REG           = (REG & ~(0xF << 8)) | (0x5 << 8); // Bits 8..11 auf den Wert 0x5 setzen
 
     /* ---------- b) Integerdivision ---------- */
     float Fahrenheit = 50.0f;

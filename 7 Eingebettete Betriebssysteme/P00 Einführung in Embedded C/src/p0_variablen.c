@@ -89,7 +89,7 @@ void Variablen(void)
     {
         int a;
         int b;
-    };                          // Dummy Struct mit zwei Werten a und b
+    }; // Dummy Struct mit zwei Werten a und b
     struct s          myStruct; // Instanziierung des Structs
     typedef struct s* tPS;      // neuer Typ: Zeiger auf einen struct
 
