@@ -21,9 +21,9 @@ typedef struct PixelBuffer
  *
  * Ensures that each component is clamped to a maximum of 255.
  *
- * @param r Red component (0–255)
- * @param g Green component (0–255)
- * @param b Blue component (0–255)
+ * @param r Red component (0 - 255)
+ * @param g Green component (0 - 255)
+ * @param b Blue component (0 - 255)
  * @return uint32_t ARGB color value
  */
 static inline uint32_t Color(uint32_t r, uint32_t g, uint32_t b)
@@ -83,7 +83,7 @@ static inline uint32_t GetPixelBufferPixel(PixelBuffer p, int32_t x, int32_t y)
  * @brief Converts a floating-point value to an 8-bit color component.
  *
  * @param y Value in range [0.0, 1.0]
- * @return uint32_t Corresponding 8-bit color component (0–255)
+ * @return uint32_t Corresponding 8-bit color component (0 - 255)
  */
 static inline uint32_t ToColorComponent(float y)
 {

@@ -15,7 +15,8 @@ static inline void swap(int32_t* a, int32_t* b)
     *b        = t;
 }
 
-#define MIN(a, b) ((a) < (b) ? (a) : (b))
-#define MAX(a, b) ((a) > (b) ? (a) : (b))
+#define MIN(a, b)          ((a) < (b) ? (a) : (b))
+#define MAX(a, b)          ((a) > (b) ? (a) : (b))
+#define CLAMP(min, a, max) MAX(MIN(a, max), min)
 
 #endif
