@@ -32,8 +32,7 @@ enum
  */
 static inline float FixedToFloat(fixed_t fixed)
 {
-    // TODO: Implement me (Sheet A02, Assignment 1)
-    return 0.0f;
+    return fixed / (float)(1 << FRAC_BITS);
 }
 
 /**
@@ -44,8 +43,7 @@ static inline float FixedToFloat(fixed_t fixed)
  */
 static inline fixed_t FloatToFixed(float fl)
 {
-    // TODO: Implement me (Sheet A02, Assignment 1)
-    return 0;
+    return (fixed_t)(fl * (float)(1 << FRAC_BITS));
 }
 
 /**
@@ -56,8 +54,18 @@ static inline fixed_t FloatToFixed(float fl)
  */
 static inline fixed_t IntToFixed(int32_t i)
 {
-    // TODO: Implement me (Sheet A02, Assignment 1)
-    return 0;
+    return i << FRAC_BITS;
+}
+
+/**
+ * @brief Converts a fixed-point value to an integer with flooring.
+ *
+ * @param fixed Fixed-point value.
+ * @return int32_t Rounded integer value.
+ */
+static inline int32_t FixedToIntFloor(fixed_t fixed)
+{
+    return fixed >> FRAC_BITS;
 }
 
 /**
@@ -68,20 +76,7 @@ static inline fixed_t IntToFixed(int32_t i)
  */
 static inline int32_t FixedToInt(fixed_t fixed)
 {
-    // TODO: Implement me (Sheet A02, Assignment 1)
-    return 0;
-}
-
-/**
- * @brief Converts a fixed-point value to an integer with rounding.
- *
- * @param fixed Fixed-point value.
- * @return int32_t Rounded integer value.
- */
-static inline int32_t FixedToIntFloor(fixed_t fixed)
-{
-    // TODO: Implement me (Sheet A02, Assignment 1)
-    return 0;
+    return FixedToIntFloor(fixed + fixed_one_half);
 }
 
 #endif
