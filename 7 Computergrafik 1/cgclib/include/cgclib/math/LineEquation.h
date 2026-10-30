@@ -32,8 +32,17 @@ typedef struct LineEquation
  */
 static inline LineEquation CreateLineEquation(fixed_t ax, fixed_t ay, fixed_t bx, fixed_t by)
 {
-    LineEquation result = { 0 };
-    // TODO: Implement me (Sheet A02, Assignment 2)
+    fixed_t nx = -by + ay;
+    fixed_t ny = bx - ax;
+    fixed_t d  = ax * nx + ay * ny;
+    float   il = 1 / sqrtf((float)(nx * nx + ny * ny));
+
+    LineEquation result = {
+        nx,
+        ny,
+        d,
+        il,
+    };
     return result;
 }
 
@@ -49,8 +58,7 @@ static inline LineEquation CreateLineEquation(fixed_t ax, fixed_t ay, fixed_t bx
  */
 static inline int32_t EvalLineEquation(LineEquation lineEquation, fixed_t x, fixed_t y)
 {
-    // TODO: Implement me (Sheet A02, Assignment 2)
-    return 0;
+    return lineEquation.nx * x + lineEquation.ny * y - lineEquation.d;
 }
 
 /**
@@ -65,8 +73,8 @@ static inline int32_t EvalLineEquation(LineEquation lineEquation, fixed_t x, fix
  */
 static inline float DistanceToLine(LineEquation lineEquation, fixed_t x, fixed_t y)
 {
-    // TODO: Implement me (Sheet A02, Assignment 2)
-    return 0.0f;
+    int32_t value = EvalLineEquation(lineEquation, x, y);
+    return (float)value * lineEquation.invLength;
 }
 
 #endif
