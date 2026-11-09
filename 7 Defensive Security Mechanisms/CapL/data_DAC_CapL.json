@@ -1,0 +1,13 @@
+{
+    "CapLUsers": {
+        "Alice": {
+            "X": [ "read", "execute" ],
+            "Y": [ "append" ],
+            "Z": [ "write" ]
+        },
+        "Bob": {
+            "X": [ "append" ],
+            "Y": [ "write" ]
+        }
+    }
+}

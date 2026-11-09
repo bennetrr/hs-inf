@@ -1,0 +1,39 @@
+{
+    "user_roles": {
+        "Alice": [
+            "Administrator"
+        ],
+        "Bob": [
+            "Developer"
+        ],
+        "Carol": [
+            "HRManager"
+        ],
+        "Dave": [
+            "Support"
+        ],
+        "Emma": [
+            "Developer"
+        ]
+    },
+    "role_permissions": {
+        "Administrator": [
+            "READ_SOURCE_CODE",
+            "DEPLOY_APPLICATION",
+            "RESET_PASSWORD"
+        ],
+        "Developer": [
+            "READ_SOURCE_CODE",
+            "WRITE_SOURCE_CODE"
+        ],
+        "HRManager": [
+            "READ_EMPLOYEE_DATA",
+            "MODIFY_EMPLOYEE_DATA"
+        ],
+        "Support": [
+            "READ_TICKETS",
+            "CLOSE_TICKETS",
+            "RESET_PASSWORD"
+        ]
+    }
+}

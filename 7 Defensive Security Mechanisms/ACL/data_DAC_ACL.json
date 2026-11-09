@@ -1,0 +1,16 @@
+{
+    "ACLObjects": {
+        "X": {
+            "Alice": [ "read", "execute" ],
+            "Bob": [ "append" ]
+        },
+        "Y": { 
+            "Alice": ["append" ], 
+            "Bob": [ "write" ]
+        },
+        "Z": { 
+            "Alice": [ "write" ], 
+            "Bob": [ ]
+        }
+    }
+}
