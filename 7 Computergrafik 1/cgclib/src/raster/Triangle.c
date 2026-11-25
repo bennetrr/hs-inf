@@ -15,7 +15,26 @@ void DrawTriangleFlatFloat(PixelBuffer p, float ax, float ay, float bx, float by
 
 void DrawTriangleFlat(PixelBuffer p, fixed_t ax, fixed_t ay, fixed_t bx, fixed_t by, fixed_t cx, fixed_t cy, Vec3 color)
 {
-    // TODO: Implement me (Sheet A02, Assignment 5)
+    const auto color_ = Color(ToColorComponent(color.x), ToColorComponent(color.y), ToColorComponent(color.z));
+    const auto bb     = ComputeClippedBoundBox(p.width, p.height, ax, ay, bx, by, cx, cy);
+    const auto lineAB = CreateLineEquation(ax, ay, bx, by);
+    const auto lineBC = CreateLineEquation(bx, by, cx, cy);
+    const auto lineCA = CreateLineEquation(cx, cy, ax, ay);
+
+    for (int32_t x = bb.x0; x <= bb.x1; ++x)
+    {
+        for (int32_t y = bb.y0; y <= bb.y1; ++y)
+        {
+            const auto fx = IntToFixed(x) + fixed_one_half;
+            const auto fy = IntToFixed(y) + fixed_one_half;
+
+            if (EvalLineEquation(lineAB, fx, fy) >= 0 && EvalLineEquation(lineBC, fx, fy) >= 0 &&
+                EvalLineEquation(lineCA, fx, fy) >= 0)
+            {
+                SetPixelBufferPixel(p, x, y, color_);
+            }
+        }
+    }
 }
 
 void DrawTriangleGouraud(PixelBuffer p, fixed_t ax, fixed_t ay, fixed_t bx, fixed_t by, fixed_t cx, fixed_t cy,

@@ -37,8 +37,15 @@ typedef struct
 static inline BoundingBox ComputeClippedBoundBox(int32_t w, int32_t h, fixed_t ax, fixed_t ay, fixed_t bx, fixed_t by,
                                                  fixed_t cx, fixed_t cy)
 {
-    BoundingBox r = { 0 };
-    // TODO: Implement me (Sheet A02, Assignment 4)
+    const fixed_t maxW = IntToFixed(w - 1);
+    const fixed_t maxH = IntToFixed(h - 1);
+
+    BoundingBox r = {
+        .x0 = FixedToInt(CLAMP(0, MIN(MIN(ax, bx), cx), maxW)),
+        .y0 = FixedToInt(CLAMP(0, MIN(MIN(ay, by), cy), maxH)),
+        .x1 = FixedToInt(CLAMP(0, MAX(MAX(ax, bx), cx), maxW)),
+        .y1 = FixedToInt(CLAMP(0, MAX(MAX(ay, by), cy), maxH)),
+    };
     return r;
 }
 
@@ -75,7 +82,7 @@ static inline BoundingBox ComputeClippedBoundBoxFloat(int32_t w, int32_t h, floa
  */
 static inline bool IsBoundingBoxZero(const BoundingBox b)
 {
-    return false;
+    return (b.x0 == b.x1) || (b.y0 == b.y1);
 }
 
 /**
@@ -125,8 +132,7 @@ static inline bool IsBoundingBoxAPixel(const BoundingBox b)
  */
 static inline bool IsDegenerate(fixed_t ax, fixed_t ay, fixed_t bx, fixed_t by, fixed_t cx, fixed_t cy)
 {
-    // TODO: Implement me (Sheet A02, Assignment 3)
-    return false;
+    return (ax == bx && ay == by) || (bx == cx && by == cy) || (cx == ax && cy == ay);
 }
 
 #endif
